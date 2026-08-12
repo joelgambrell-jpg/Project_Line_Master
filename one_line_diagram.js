@@ -101,6 +101,13 @@
 
   let instanceSequence = 0;
 
+  /*
+   * FIREBASE_CUTOVER_REMOVE:
+   * Sections 02 and 04 contain standalone sample equipment/layouts. Remove
+   * them after the host always supplies equipment and Firestore supplies the
+   * initial layout. Replace an absent production layout with an explicit empty
+   * state, not the Ohio demonstration diagram.
+   */
   // ==============================================================
   // 02. REALISTIC SAMPLE EQUIPMENT
   // ==============================================================
@@ -2159,6 +2166,11 @@
       /* Fall through to the legacy diagramId signature. */
     }
 
+    /*
+     * FIREBASE_CUTOVER_REMOVE:
+     * Delete the legacy diagramId-only fallback after every production adapter
+     * uses the contextual {projectId, buildingId, diagramId} signature.
+     */
     try {
       const legacyResult = adapter.load(instance.diagramId);
 
@@ -2189,6 +2201,8 @@
     try {
       return adapter.save(context, layout);
     } catch (contextError) {
+      // FIREBASE_CUTOVER_REMOVE: delete this legacy save signature after the
+      // host adapter uses the contextual signature everywhere.
       return adapter.save(instance.diagramId, layout);
     }
   }
@@ -2233,8 +2247,12 @@
     }
 
     /*
-     * Polling is only a fallback for adapters that do not expose a
-     * subscription. localStorage cannot provide cross-device updates.
+     * FIREBASE_CUTOVER_REMOVE:
+     * Polling is only a standalone fallback for adapters without realtime
+     * subscriptions. Delete this block after the host adapter always exposes
+     * subscribe(context, callback).
+     *
+     * localStorage cannot provide cross-device updates.
      */
     if (instance.autoRefreshMs > 0) {
       instance.refreshTimer = window.setInterval(
