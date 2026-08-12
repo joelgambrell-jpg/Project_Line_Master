@@ -111,22 +111,34 @@
     const host = canvasToolbar && canvasToolbar.parentElement;
     if (!host) return;
 
-    const legend = document.createElement("div");
+    const legend = document.createElement("details");
     legend.className = "nx-readiness-legend";
+    legend.open = !window.matchMedia("(max-width: 800px)").matches;
+    legend.setAttribute("aria-label", "Completion percentage color key");
     legend.innerHTML = [
-      "<strong>ENERGIZATION READINESS</strong>",
+      '<summary><span>Completion color key</span>' +
+        '<span class="nx-readiness-preview" aria-hidden="true">' +
+        dot(COLORS.gray) + dot(COLORS.blue) + dot(COLORS.orange) +
+        dot(COLORS.yellow) + dot(COLORS.green) + dot(COLORS.red) +
+        "</span></summary>",
+      '<div class="nx-readiness-items">',
       chip(COLORS.gray, "0% Not Started"),
       chip(COLORS.blue, "1–25%"),
       chip(COLORS.orange, "26–60%"),
       chip(COLORS.yellow, "61–99%"),
       chip(COLORS.green, "100% Ready"),
-      chip(COLORS.red, "Energized")
+      chip(COLORS.red, "Energized (manual)"),
+      "</div>"
     ].join("");
     host.insertBefore(legend, canvasToolbar.nextSibling);
   }
 
   function chip(color, label) {
     return '<span class="nx-readiness-chip"><i style="--chip-color:' + color + '"></i>' + label + "</span>";
+  }
+
+  function dot(color) {
+    return '<i style="--chip-color:' + color + '"></i>';
   }
 
   function selectedEquipmentId(root) {
