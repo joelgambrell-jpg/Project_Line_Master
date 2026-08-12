@@ -166,6 +166,28 @@
       display: block;
       font-size: 16px;
     }
+    .published-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      position: relative;
+    }
+    .published-icon::before,
+    .published-icon::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 1.5px;
+      height: 5px;
+      background: currentColor;
+      transform-origin: 50% 100%;
+    }
+    .published-icon::after {
+      transform: rotate(120deg);
+    }
     .actions {
       display: flex;
       justify-content: center;
@@ -208,10 +230,53 @@
       .qr-brand { min-width: 104px; font-size: 23px; padding: 7px 10px 6px; }
     }
     @media print {
-      @page { size: portrait; margin: .25in; }
-      body { background: #fff; padding: 0; }
-      .sheet { border: 2px solid #111; width: 100%; }
-      .ace-logo { width: 92%; max-height: 1.35in; }
+      @page { size: letter portrait; margin: .25in; }
+      html,
+      body {
+        width: 8in;
+        height: 10.5in;
+        margin: 0;
+        overflow: hidden;
+        background: #fff;
+      }
+      body {
+        display: block;
+        min-height: 0;
+        padding: 0;
+      }
+      .sheet {
+        width: 100%;
+        height: 10.5in;
+        margin: 0;
+        padding: .16in .24in .12in;
+        border: 1.5px solid #111;
+        border-radius: 10px;
+        overflow: hidden;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .ace-logo-wrap { padding: 0 0 .03in; }
+      .ace-logo { width: 88%; max-height: 1.12in; }
+      .divider { margin: .03in 0 .09in; }
+      h1 { margin: 0 0 .1in; font-size: 25px; }
+      .project-block { margin-bottom: .1in; }
+      .project-cell { padding: .08in .07in .1in; }
+      .project-label { margin-bottom: .03in; font-size: 12px; }
+      .project-value { font-size: 25px; }
+      .qr-wrap {
+        width: 3.55in;
+        max-width: 3.55in;
+        margin: .07in auto .08in;
+      }
+      .qr-brand { min-width: 1.08in; padding: .06in .09in; font-size: 25px; }
+      .instruction { margin: .04in 0 .02in; font-size: 17px; }
+      .live-note { margin: 0 auto .07in; font-size: 12px; line-height: 1.2; }
+      .viewer-access { padding: .06in .1in; margin-top: .04in; }
+      .viewer-access h2 { margin: 0 0 .025in; font-size: 15px; }
+      .viewer-access p { margin: .02in auto; font-size: 10.5px; line-height: 1.18; }
+      .published { gap: .06in; margin-top: .06in; }
+      .published-label { font-size: 9px; }
+      .published-value { font-size: 12px; }
       .actions { display: none; }
     }
   </style>
@@ -262,7 +327,7 @@
     </section>
 
     <div class="published" aria-label="Published date and time">
-      <span aria-hidden="true">◷</span>
+      <span class="published-icon" aria-hidden="true"></span>
       <span>
         <span class="published-label">Published</span>
         <span id="publishedValue" class="published-value"></span>
@@ -344,3 +409,4 @@
   </script>
 </body>
 </html>
+
