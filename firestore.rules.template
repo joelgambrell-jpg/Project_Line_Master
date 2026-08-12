@@ -1,3 +1,10 @@
+/*
+ * FIREBASE_CUTOVER_REMOVE — DO NOT DEPLOY AS A SEPARATE RULESET
+ * -------------------------------------------------------------
+ * The counterpart host already owns permissions and security. Use this file
+ * only as a path-reference during integration, then remove it after the host's
+ * canonical rules cover layout and energization documents.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {

@@ -1,4 +1,10 @@
 /**
+ * FIREBASE_CUTOVER_REPLACE — DO NOT ENABLE THIS TEMPLATE UNCHANGED
+ * ---------------------------------------------------------------
+ * Replace its internal paths, SDK calls, equipment query, and app lookup with
+ * the counterpart host tool's actual Firebase integration. After the host
+ * adapter is implemented and accepted, remove this template from production.
+ *
  * ================================================================
  * NEXUS ONE-LINE FIREBASE ADAPTER TEMPLATE
  * FILE: one_line_firebase_adapter.template.js

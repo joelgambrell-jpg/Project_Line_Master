@@ -1,3 +1,10 @@
+/**
+ * FIREBASE_CUTOVER_REMOVE — ENTIRE FILE AFTER ACCEPTANCE
+ * ------------------------------------------------------
+ * Development-only localStorage backend. Keep it during migration and the
+ * rollback window, then remove this file and its script tag after the host
+ * Firebase adapter has passed cross-device acceptance tests.
+ */
 window.NexusOneLineStorage = (() => {
   "use strict";
 
