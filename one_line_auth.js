@@ -1,4 +1,10 @@
 /**
+ * FIREBASE_CUTOVER_REMOVE — ENTIRE FILE IN HOST TOOL
+ * --------------------------------------------------
+ * The counterpart host already owns authentication, authorization, project
+ * membership, login routing, and return URLs. Remove this standalone gate and
+ * its script tag when the host integration supplies the current session.
+ *
  * NEXUS One-Line Authentication Gate
  *
  * Local development remains enabled by default. Set
