@@ -1,5 +1,11 @@
 /**
- * Copy to firebase-config.js during Firebase deployment.
+ * FIREBASE_CUTOVER_REMOVE — ENTIRE FILE IN HOST TOOL
+ * --------------------------------------------------
+ * Do not create a second Firebase initialization when this component is
+ * embedded in the counterpart tool. Receive the host's initialized Firebase
+ * app/database instead, then remove this template and its script tag.
+ *
+ * Copy to firebase-config.js during standalone Firebase deployment only.
  * Do not place service-account keys or Admin SDK secrets in browser code.
  * Firebase web configuration values are identifiers; Firestore rules and
  * Firebase Authentication provide the actual security boundary.
