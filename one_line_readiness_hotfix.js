@@ -267,16 +267,28 @@
       return;
     }
 
-    const legend = document.createElement("div");
+    const legend = document.createElement("details");
     legend.className = "nx-readiness-legend";
+    legend.open = !window.matchMedia("(max-width: 800px)").matches;
+    legend.setAttribute("aria-label", "Completion percentage color key");
     legend.innerHTML =
-      "<strong>ENERGIZATION READINESS</strong>" +
+      '<summary><span>Completion color key</span>' +
+      '<span class="nx-readiness-preview" aria-hidden="true">' +
+      createLegendDot(COLORS.gray) +
+      createLegendDot(COLORS.blue) +
+      createLegendDot(COLORS.orange) +
+      createLegendDot(COLORS.yellow) +
+      createLegendDot(COLORS.green) +
+      createLegendDot(COLORS.red) +
+      "</span></summary>" +
+      '<div class="nx-readiness-items">' +
       createLegendItem(COLORS.gray, "0% Not Started") +
       createLegendItem(COLORS.blue, "1-25%") +
       createLegendItem(COLORS.orange, "26-60%") +
       createLegendItem(COLORS.yellow, "61-99%") +
       createLegendItem(COLORS.green, "100% Ready") +
-      createLegendItem(COLORS.red, "Energized");
+      createLegendItem(COLORS.red, "Energized (manual)") +
+      "</div>";
 
     toolbar.parentElement.insertBefore(
       legend,
@@ -291,6 +303,10 @@
       label +
       "</span>"
     );
+  }
+
+  function createLegendDot(color) {
+    return '<i style="--chip-color:' + color + '"></i>';
   }
 
   function applyFieldPresentation(root) {
