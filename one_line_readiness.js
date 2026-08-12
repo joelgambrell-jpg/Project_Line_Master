@@ -107,9 +107,7 @@
 
   function addLegend(root) {
     if (root.querySelector(".nx-readiness-legend")) return;
-    const canvasToolbar = root.querySelector(".canvas-toolbar");
-    const host = canvasToolbar && canvasToolbar.parentElement;
-    if (!host) return;
+    const host = root;
 
     const legend = document.createElement("details");
     legend.className = "nx-readiness-legend";
@@ -130,7 +128,7 @@
       chip(COLORS.red, "Energized (manual)"),
       "</div>"
     ].join("");
-    host.insertBefore(legend, canvasToolbar.nextSibling);
+    host.appendChild(legend);
   }
 
   function chip(color, label) {
