@@ -38,6 +38,12 @@
     red: "#ff2438"
   };
 
+  /*
+   * FIREBASE_CUTOVER_REMOVE:
+   * This prefix and the local load/save/storage-event path below are
+   * development-only. Replace them with the host energization data source,
+   * then delete the localStorage implementation after migration.
+   */
   const ENERGIZED_PREFIX = "nexus-one-line-energized-v1:";
   const mounted = new WeakMap();
 
@@ -346,6 +352,8 @@
     });
     state.observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "transform"] });
 
+    // FIREBASE_CUTOVER_REMOVE: replace this same-device listener with the
+    // host energization subscription before deleting the localStorage path.
     window.addEventListener("storage", function handleEnergizedStorage(event) {
       if (event.key === storageKey(context)) decorate(state);
     });
