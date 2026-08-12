@@ -25,7 +25,7 @@
     if (document.querySelector('link[data-nexus-field-compact="1"]')) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "one_line_field_compact.css?v=3";
+    link.href = "one_line_field_compact.css?v=4";
     link.dataset.nexusFieldCompact = "1";
     document.head.appendChild(link);
   }
