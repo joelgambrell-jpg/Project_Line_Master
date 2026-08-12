@@ -261,11 +261,6 @@
       return;
     }
 
-    const toolbar = root.querySelector(".canvas-toolbar");
-
-    if (!toolbar || !toolbar.parentElement) {
-      return;
-    }
 
     const legend = document.createElement("details");
     legend.className = "nx-readiness-legend";
@@ -290,10 +285,7 @@
       createLegendItem(COLORS.red, "Energized (manual)") +
       "</div>";
 
-    toolbar.parentElement.insertBefore(
-      legend,
-      toolbar.nextSibling
-    );
+    root.appendChild(legend);
   }
 
   function createLegendItem(color, label) {
