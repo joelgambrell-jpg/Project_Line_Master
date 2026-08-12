@@ -33,6 +33,13 @@
   </main>
 
 <!--
+  FIREBASE_CUTOVER_REMOVE:
+  When this component is mounted inside the counterpart host tool, remove the
+  standalone firebase-config.template.js and one_line_auth.js script tags
+  below. The host must provide its initialized Firebase app, current session,
+  project context, and equipment source. Keep one_line_storage.js only through
+  migration/rollback, then remove it after Firebase acceptance.
+
   ACTIVE SCRIPT / STORAGE ORDER
   -----------------------------
   1. firebase-config.template.js provides disabled migration settings.
