@@ -17,20 +17,20 @@ function install(){
  function open(){
   if(!api()||!api().can("loto","manage"))return;
   const ids=equipmentIds(),selected=selectedId();
-  modal.innerHTML='<div class="nx-loto-dialog" role="dialog" aria-modal="true" aria-labelledby="nxStartLotoTitle"><header><div><span>ACE CONTROLLED LOTO</span><h2 id="nxStartLotoTitle">Start LOTO</h2></div><button type="button" data-cancel aria-label="Cancel">×</button></header>'+
+  modal.innerHTML='<div class="nx-loto-dialog" role="dialog" aria-modal="true" aria-labelledby="nxStartLotoTitle"><header><div><span>CONTROLLED LOTO</span><h2 id="nxStartLotoTitle">Start LOTO</h2></div><button type="button" data-cancel aria-label="Cancel">×</button></header>'+
   '<form><label>Work Equipment<select name="equipmentId" required><option value="">Select equipment</option>'+ids.map(id=>'<option '+(id===selected?'selected ':'')+'value="'+esc(id)+'">'+esc(id)+'</option>').join("")+'</select></label>'+
   '<label>Controlling Isolation Point<select name="isolationPoint" required><option value="">Select isolation equipment</option>'+ids.map(id=>'<option value="'+esc(id)+'">'+esc(id)+'</option>').join("")+'</select><small>Select the approved physical isolation point. NEXUS does not declare this selection electrically safe.</small></label>'+
-  '<div class="nx-loto-form-row"><label>ACE LOTO #<input name="lotoNumber" required placeholder="ACE LOTO-0264"></label><label>Energy Marshal<input name="energyMarshal" required placeholder="Name"></label></div>'+
+  '<div class="nx-loto-form-row"><label>LOTO #<input name="lotoNumber" required placeholder="LOTO-0264"></label><label>Energy Marshal<input name="energyMarshal" required placeholder="Name"></label></div>'+
   '<label>Work / Scope Description<textarea name="scope" rows="3" required placeholder="Describe the equipment and work covered by this LOTO"></textarea></label>'+
   '<label class="nx-loto-confirm"><input type="checkbox" name="fieldVerified" required><span>I am recording the approved field isolation information. This software record does not replace physical LOTO verification.</span></label>'+
-  '<footer><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Create ACE LOTO</button></footer></form></div>';
+  '<footer><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Create LOTO</button></footer></form></div>';
   modal.classList.add("is-open");modal.setAttribute("aria-hidden","false");
  }
  modal.addEventListener("click",e=>{if(e.target===modal||e.target.closest("[data-cancel]"))close();});
  modal.addEventListener("submit",e=>{
-  e.preventDefault();const form=e.target;if(!form.reportValidity())return;const fd=new FormData(form),createdAt=now(),id=uid("ace-loto"),actor=String(fd.get("energyMarshal")||"").trim();
+  e.preventDefault();const form=e.target;if(!form.reportValidity())return;const fd=new FormData(form),createdAt=now(),id=uid("loto"),actor=String(fd.get("energyMarshal")||"").trim();
   const record={id,lotoNumber:String(fd.get("lotoNumber")||"").trim(),status:"active",equipmentId:String(fd.get("equipmentId")||"").trim(),equipmentIds:[String(fd.get("equipmentId")||"").trim()],protectedEquipmentIds:[String(fd.get("equipmentId")||"").trim()],isolationPoint:String(fd.get("isolationPoint")||"").trim(),energyMarshal:actor,scope:String(fd.get("scope")||"").trim(),fieldVerificationRecorded:true,createdAt,createdBy:actor,ownerLayer:"loto"};
-  const d=api().loadLoto();d.aceLotos.push(record);d.events.push({id:uid("event"),type:"ACE_LOTO_CREATED",timestamp:createdAt,actor,layer:"loto",recordId:id,lotoNumber:record.lotoNumber,equipmentId:record.equipmentId,isolationPoint:record.isolationPoint,payload:{scope:record.scope,status:"active"}});
+  const d=api().loadLoto();d.lotos.push(record);d.events.push({id:uid("event"),type:"LOTO_CREATED",timestamp:createdAt,actor,layer:"loto",recordId:id,lotoNumber:record.lotoNumber,equipmentId:record.equipmentId,isolationPoint:record.isolationPoint,payload:{scope:record.scope,status:"active"}});
   api().saveLoto(d);close();
  });
  window.addEventListener("nexus:loto-start-request",open);window.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("is-open"))close();});
