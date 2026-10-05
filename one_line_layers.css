@@ -1,24 +1,21 @@
 /*
  * NEXUS ONE-LINE OPERATIONAL LAYERS
- * Additive shell for Readiness, Energization, and LOTO.
- * The SME-built topology remains authoritative and unchanged by layer switching.
+ * Additive shell. Operational layers never own or rewrite SME topology.
  */
 .nx-layer-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#111317;border-bottom:1px solid #353941;color:#f4f6f8;min-height:52px;box-sizing:border-box}
-.nx-layer-label{font-size:11px;font-weight:900;letter-spacing:1.4px;color:#aeb5bf;text-transform:uppercase;margin-right:2px}
-.nx-layer-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.nx-layer-label{font-size:11px;font-weight:900;letter-spacing:1.4px;color:#aeb5bf;text-transform:uppercase;margin-right:2px}.nx-layer-tabs{display:flex;gap:6px;flex-wrap:wrap}
 .nx-layer-tab{min-height:38px;padding:7px 13px;border:1px solid #484e58;border-radius:7px;background:#1b1e23;color:#e8ebef;font:800 12px/1.1 Arial,sans-serif;cursor:pointer}
 .nx-layer-tab[aria-pressed="true"]{background:#e9edf2;color:#101216;border-color:#f8fafc;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
-.nx-layer-tab[data-layer="readiness"][aria-pressed="true"]{border-color:#00f56a}
-.nx-layer-tab[data-layer="energization"][aria-pressed="true"]{border-color:#ff2438}
-.nx-layer-tab[data-layer="loto"][aria-pressed="true"]{background:#33280a;color:#ffe98a;border-color:#f3c52b}
-.nx-layer-spacer{flex:1}
-.nx-layer-mode{font-size:11px;color:#aeb5bf;white-space:nowrap}
-.nx-layer-mode strong{color:#fff}
-.nx-layer-drawer{display:none;border-bottom:1px solid #353941;background:#171a1f;color:#eef1f5;padding:10px 12px}
-.nx-layer-drawer.is-open{display:block}
-.nx-layer-summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.nx-layer-summary strong{font-size:13px}
-.nx-layer-summary span{font-size:12px;color:#b9c0c9}
-.nx-layer-summary button{min-height:36px;padding:6px 11px;border:1px solid #535b67;border-radius:6px;background:#24282f;color:#fff;font-weight:800}
-.nx-layer-loto-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid #f3c52b;border-radius:999px;color:#ffe98a!important;background:#2c240d}
-@media(max-width:800px){.nx-layer-bar{align-items:flex-start;flex-wrap:wrap}.nx-layer-label{width:100%}.nx-layer-tabs{width:100%}.nx-layer-tab{flex:1;min-width:88px;min-height:44px}.nx-layer-mode{width:100%}}
+.nx-layer-tab[data-layer="readiness"][aria-pressed="true"]{border-color:#00f56a}.nx-layer-tab[data-layer="energization"][aria-pressed="true"]{border-color:#ff2438}
+.nx-layer-tab[data-layer="loto"][aria-pressed="true"]{background:#33280a;color:#ffe98a;border-color:#f3c52b}.nx-layer-spacer{flex:1}.nx-layer-mode{font-size:11px;color:#aeb5bf;white-space:nowrap}.nx-layer-mode strong{color:#fff}
+.nx-layer-drawer{display:none;border-bottom:1px solid #353941;background:#171a1f;color:#eef1f5;padding:10px 12px}.nx-layer-drawer.is-open{display:block}.nx-layer-summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.nx-layer-summary strong{font-size:13px}.nx-layer-summary span{font-size:12px;color:#b9c0c9}
+.nx-loto-overview{display:grid;grid-template-columns:auto minmax(420px,1fr) auto;align-items:center;gap:16px}.nx-loto-title strong,.nx-loto-title span{display:block}.nx-loto-title strong{color:#ffe169;font-size:14px;letter-spacing:1px}.nx-loto-title span{color:#aeb5bf;font-size:10px;margin-top:2px}
+.nx-loto-metrics{display:grid;grid-template-columns:repeat(4,minmax(92px,1fr));gap:7px}.nx-loto-metrics div{min-height:52px;padding:6px 9px;border:1px solid #4a4530;border-radius:7px;background:#211d11}.nx-loto-metrics b{display:block;color:#fff2a6;font-size:21px;line-height:1}.nx-loto-metrics span{display:block;color:#c9c1a0;font-size:10px;margin-top:5px;text-transform:uppercase;font-weight:800;letter-spacing:.5px}
+.nx-loto-actions{display:flex;gap:7px}.nx-loto-actions button{min-height:40px;padding:7px 11px;border:1px solid #70683f;border-radius:7px;background:#2a271c;color:#fff3b3;font-weight:800;cursor:pointer}
+body[data-nexus-layer="base"] .nx-readiness-legend{display:none!important}
+body[data-nexus-layer="energization"] .nx-readiness-legend{display:none!important}
+body[data-nexus-layer="loto"] .nx-readiness-legend{display:none!important}
+body[data-nexus-layer="loto"] .nexus-one-line .node{opacity:.72}
+body[data-nexus-layer="loto"] .nexus-one-line .connection{opacity:.5}
+@media(max-width:900px){.nx-loto-overview{grid-template-columns:1fr}.nx-loto-actions button{min-height:44px}.nx-loto-metrics{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:800px){.nx-layer-bar{align-items:flex-start;flex-wrap:wrap}.nx-layer-label{width:100%}.nx-layer-tabs{width:100%}.nx-layer-tab{flex:1;min-width:88px;min-height:44px}.nx-layer-mode{width:100%}.nx-loto-metrics{grid-template-columns:repeat(2,1fr)}}
