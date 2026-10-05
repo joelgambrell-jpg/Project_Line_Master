@@ -8,10 +8,10 @@
 const mounted=new WeakSet();
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function active(v,closed){return v&&String(v.status||"").toLowerCase()!==closed;}
-function records(){return window.NEXUSOneLineLayers&&window.NEXUSOneLineLayers.loadLoto?window.NEXUSOneLineLayers.loadLoto():{aceLotos:[],personalLocks:[]};}
+function records(){return window.NEXUSOneLineLayers&&window.NEXUSOneLineLayers.loadLoto?window.NEXUSOneLineLayers.loadLoto():{lotos:[],personalLocks:[]};}
 function selectedId(root){const n=root.querySelector(".node.selected");if(!n)return"";return String(n.dataset.equipmentId||(n.querySelector(".id")&&n.querySelector(".id").textContent)||"").trim();}
-function aceForEquipment(data,id){
- return data.aceLotos.filter(a=>active(a,"closed")&&(
+function lotoForEquipment(data,id){
+ return data.lotos.filter(a=>active(a,"closed")&&(
    String(a.equipmentId||"")===id ||
    (Array.isArray(a.equipmentIds)&&a.equipmentIds.map(String).includes(id)) ||
    (Array.isArray(a.protectedEquipmentIds)&&a.protectedEquipmentIds.map(String).includes(id))
@@ -25,12 +25,12 @@ function install(root){
  function render(){
    const isLoto=document.body.dataset.nexusLayer==="loto";panel.classList.toggle("is-open",isLoto);if(!isLoto)return;
    const id=selectedId(root);if(!id){panel.innerHTML='<div class="nx-loto-empty"><strong>Select equipment</strong><span>Tap equipment on the One-Line to inspect its LOTO relationship.</span></div>';return;}
-   const data=records(),aces=aceForEquipment(data,id),locks=locksForEquipment(data,id),people=new Map();
+   const data=records(),lotos=lotoForEquipment(data,id),locks=locksForEquipment(data,id),people=new Map();
    locks.forEach(l=>{const key=l.personId||l.personName||l.lockId;if(!people.has(key))people.set(key,{name:l.personName||l.personId||"Unknown person",company:l.company||"",locks:[]});people.get(key).locks.push(l);});
-   const controlling=aces[0]||null;
+   const controlling=lotos[0]||null;
    let html='<header><div><span class="nx-loto-kicker">LOTO EQUIPMENT</span><h2>'+esc(id)+'</h2></div><span class="nx-loto-state '+(controlling||locks.length?"active":"clear")+'">'+(controlling||locks.length?"LOTO ACTIVE":"NO ACTIVE LOTO")+'</span></header>';
-   html+='<section class="nx-loto-card"><h3>ACE CONTROL</h3>';
-   if(controlling){html+='<dl><dt>ACE LOTO</dt><dd>'+esc(controlling.lotoNumber||controlling.id||"Active")+'</dd><dt>Energy Marshal</dt><dd>'+esc(controlling.energyMarshal||controlling.controllingEnergyMarshal||"Not recorded")+'</dd><dt>Isolation Point</dt><dd>'+esc(controlling.isolationPoint||controlling.isolationEquipmentId||"Not recorded")+'</dd></dl>';}else{html+='<p>No active ACE LOTO currently references this equipment.</p>';}html+='</section>';
+   html+='<section class="nx-loto-card"><h3>LOTO CONTROL</h3>';
+   if(controlling){html+='<dl><dt>LOTO</dt><dd>'+esc(controlling.lotoNumber||controlling.id||"Active")+'</dd><dt>Energy Marshal</dt><dd>'+esc(controlling.energyMarshal||controlling.controllingEnergyMarshal||"Not recorded")+'</dd><dt>Isolation Point</dt><dd>'+esc(controlling.isolationPoint||controlling.isolationEquipmentId||"Not recorded")+'</dd></dl>';}else{html+='<p>No active controlling LOTO currently references this equipment.</p>';}html+='</section>';
    html+='<section class="nx-loto-card"><div class="nx-loto-card-head"><h3>PEOPLE & PERSONAL LOCKS</h3><b>'+people.size+'</b></div>';
    if(!people.size){html+='<p>No active personal locks are recorded on this equipment.</p>';}else{people.forEach(p=>{html+='<div class="nx-loto-person"><div><strong>'+esc(p.name)+'</strong><span>'+esc(p.company||"Company not recorded")+'</span></div><div class="nx-loto-locks">'+p.locks.map(l=>'<span>'+esc(l.lockId||l.lockNumber||"LOCK")+'</span>').join("")+'</div></div>';});}html+='</section>';
    html+='<section class="nx-loto-card nx-loto-source"><h3>ELECTRICAL SOURCE OF TRUTH</h3><p>Equipment identity and electrical relationships come from the SME-built One-Line. This LOTO layer only attaches operational records to that topology.</p></section>';
