@@ -14,14 +14,14 @@
   function permissionName(layer,action){return(action||"view")+"_"+(layer==="base"?"oneline":layer);}
   function can(layer,action){const hook=window.NEXUS_LAYER_PERMISSIONS;if(!hook)return true;if(hook.superUser===true)return true;return hook[permissionName(layer,action)]!==false;}
   function lotoKey(c){return LOTO_PREFIX+c.projectId+":"+c.buildingId;}
-  function loadLoto(c){try{const raw=JSON.parse(localStorage.getItem(lotoKey(c))||"{}");return{aceLotos:Array.isArray(raw.aceLotos)?raw.aceLotos:[],personalLocks:Array.isArray(raw.personalLocks)?raw.personalLocks:[],events:Array.isArray(raw.events)?raw.events:[]};}catch(e){console.warn("[NEXUS LOTO] load failed",e);return{aceLotos:[],personalLocks:[],events:[]};}}
+  function loadLoto(c){try{const raw=JSON.parse(localStorage.getItem(lotoKey(c))||"{}");return{lotos:Array.isArray(raw.lotos)?raw.lotos:[],personalLocks:Array.isArray(raw.personalLocks)?raw.personalLocks:[],events:Array.isArray(raw.events)?raw.events:[]};}catch(e){console.warn("[NEXUS LOTO] load failed",e);return{lotos:[],personalLocks:[],events:[]};}}
   function saveLoto(c,records){localStorage.setItem(lotoKey(c),JSON.stringify(records));window.dispatchEvent(new CustomEvent("nexus:loto-change",{detail:{context:c}}));return records;}
   function summarizeLoto(records){
-    const active=records.aceLotos.filter(x=>x&&x.status!=="closed");
+    const active=records.lotos.filter(x=>x&&x.status!=="closed");
     const locks=records.personalLocks.filter(x=>x&&x.status!=="removed");
     const people=new Set(locks.map(x=>x.personId||x.personName).filter(Boolean));
     const equipment=new Set(locks.map(x=>x.equipmentId).filter(Boolean));
-    return{ace:active.length,locks:locks.length,people:people.size,equipment:equipment.size};
+    return{lotos:active.length,locks:locks.length,people:people.size,equipment:equipment.size};
   }
   function install(){
     const host=document.getElementById("oneLineWorkspaceHost");if(!host||document.querySelector(".nx-layer-bar"))return;
@@ -37,7 +37,7 @@
       if(layer==="energization"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Energization</strong><span>Shows confirmed energized state independently from QC completion. Topology remains owned by SME / Engineering.</span></div>';return;}
       const s=summarizeLoto(loadLoto(context()));
       drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Read-only operational view</span></div>'+
-        '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.ace+'</b><span>ACE LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div></div>'+
+        '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div></div>'+
         '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ Start LOTO</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
     }
     function setLayer(layer){
