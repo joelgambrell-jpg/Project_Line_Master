@@ -6,7 +6,7 @@
 (function(){
   "use strict";
   const LAYERS=["base","readiness","energization","loto"];
-  const OWNERS={base:"SME / Engineering",readiness:"Quality / Readiness",energization:"Energization",loto:"Energy Marshal"};
+  const OWNERS={base:"SME / Engineering",readiness:"Quality / Readiness",energization:"Energization",loto:"LOTO Coordinator"};
   const LOTO_PREFIX="nexus-one-line-loto-v1:";
   function params(){return new URLSearchParams(location.search);}
   function context(){const q=params();return{projectId:q.get("project")||"sample-project",buildingId:q.get("building")||"A",diagramId:q.get("diagram")||"overall"};}
@@ -36,9 +36,9 @@
       if(layer==="readiness"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Readiness</strong><span>QC completion status over the approved SME One-Line. Topology remains read-only to this layer.</span></div>';return;}
       if(layer==="energization"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Energization</strong><span>Shows confirmed energized state independently from QC completion. Topology remains owned by SME / Engineering.</span></div>';return;}
       const s=summarizeLoto(loadLoto(context()));
-      drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Read-only operational view</span></div>'+
+      drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Controlled operational layer</span></div>'+
         '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div></div>'+
-        '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ Start LOTO</button><button type="button" data-loto-action="add-person">+ Add Person / Lock</button><button type="button" data-loto-action="remove-person">Remove Person / Lock</button><button type="button" data-loto-action="close">Close LOTO</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="history">History</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
+        '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ Start LOTO</button><button type="button" data-loto-action="add-person">+ Add Person / Lock</button><button type="button" data-loto-action="remove-person">Remove Person / Lock</button><button type="button" data-loto-action="progress">Release / Restore</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="history">History</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
     }
     function setLayer(layer){
       if(!LAYERS.includes(layer)||!can(layer,"view"))return;
@@ -49,7 +49,7 @@
       const url=new URL(location.href);if(layer==="base")url.searchParams.delete("layer");else url.searchParams.set("layer",layer);history.replaceState(null,"",url);
       window.dispatchEvent(new CustomEvent("nexus:layerchange",{detail:{layer,owner:OWNERS[layer]}}));
     }
-    drawer.addEventListener("click",e=>{const action=e.target&&e.target.dataset&&e.target.dataset.lotoAction;if(action==="fit"&&window.nexusOneLineWorkspace&&typeof window.nexusOneLineWorkspace.fit==="function")window.nexusOneLineWorkspace.fit();if(action==="find")window.dispatchEvent(new CustomEvent("nexus:loto-find-request"));if(action==="history"&&can("loto","history"))window.dispatchEvent(new CustomEvent("nexus:loto-history-request"));if(action==="start"&&can("loto","manage"))window.dispatchEvent(new CustomEvent("nexus:loto-start-request"));if(action==="add-person"&&can("loto","participate"))window.dispatchEvent(new CustomEvent("nexus:loto-add-person-request"));if(action==="remove-person"&&can("loto","participate"))window.dispatchEvent(new CustomEvent("nexus:loto-remove-person-request"));if(action==="close"&&can("loto","manage"))window.dispatchEvent(new CustomEvent("nexus:loto-close-request"));});
+    drawer.addEventListener("click",e=>{const action=e.target&&e.target.dataset&&e.target.dataset.lotoAction;if(action==="fit"&&window.nexusOneLineWorkspace&&typeof window.nexusOneLineWorkspace.fit==="function")window.nexusOneLineWorkspace.fit();if(action==="find")window.dispatchEvent(new CustomEvent("nexus:loto-find-request"));if(action==="history"&&can("loto","history"))window.dispatchEvent(new CustomEvent("nexus:loto-history-request"));if(action==="start"&&can("loto","manage"))window.dispatchEvent(new CustomEvent("nexus:loto-start-request"));if(action==="add-person"&&can("loto","participate"))window.dispatchEvent(new CustomEvent("nexus:loto-add-person-request"));if(action==="remove-person"&&can("loto","participate"))window.dispatchEvent(new CustomEvent("nexus:loto-remove-person-request"));if(action==="progress"&&can("loto","manage"))window.dispatchEvent(new CustomEvent("nexus:loto-progress-request"));});
     window.addEventListener("storage",e=>{if(e.key===lotoKey(context())&&document.body.dataset.nexusLayer==="loto")renderDrawer("loto");});
     window.addEventListener("nexus:loto-change",()=>{if(document.body.dataset.nexusLayer==="loto")renderDrawer("loto");});
     window.NEXUSOneLineLayers={setLayer,can,owners:{...OWNERS},getLayer:()=>document.body.dataset.nexusLayer||"base",loadLoto:()=>loadLoto(context()),saveLoto:(records)=>saveLoto(context(),records),context:()=>({...context()})};
