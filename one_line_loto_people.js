@@ -6,7 +6,7 @@
 "use strict";
 const mounted=new WeakSet();
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function data(){return window.NEXUSOneLineLayers&&window.NEXUSOneLineLayers.loadLoto?window.NEXUSOneLineLayers.loadLoto():{aceLotos:[],personalLocks:[]};}
+function data(){return window.NEXUSOneLineLayers&&window.NEXUSOneLineLayers.loadLoto?window.NEXUSOneLineLayers.loadLoto():{lotos:[],personalLocks:[]};}
 function activeLocks(){return data().personalLocks.filter(x=>x&&String(x.status||"").toLowerCase()!=="removed");}
 function groupPeople(locks){const m=new Map();locks.forEach(l=>{const key=String(l.personId||l.personName||l.lockId||"unknown");if(!m.has(key))m.set(key,{id:key,name:l.personName||l.personId||"Unknown person",company:l.company||"",locks:[]});m.get(key).locks.push(l);});return Array.from(m.values()).sort((a,b)=>a.name.localeCompare(b.name));}
 function selectEquipment(root,id){const nodes=Array.from(root.querySelectorAll(".node"));const node=nodes.find(n=>String(n.dataset.equipmentId||(n.querySelector(".id")&&n.querySelector(".id").textContent)||"").trim()===String(id));if(!node)return false;node.dispatchEvent(new MouseEvent("click",{bubbles:true,cancelable:true,view:window}));node.scrollIntoView({block:"center",inline:"center"});return true;}
