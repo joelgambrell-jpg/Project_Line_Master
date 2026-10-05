@@ -15,7 +15,8 @@
   function can(layer,action){const hook=window.NEXUS_LAYER_PERMISSIONS;if(!hook)return true;if(hook.superUser===true)return true;return hook[permissionName(layer,action)]!==false;}
   function lotoKey(c){return LOTO_PREFIX+c.projectId+":"+c.buildingId;}
   function loadLoto(c){try{const raw=JSON.parse(localStorage.getItem(lotoKey(c))||"{}");return{aceLotos:Array.isArray(raw.aceLotos)?raw.aceLotos:[],personalLocks:Array.isArray(raw.personalLocks)?raw.personalLocks:[],events:Array.isArray(raw.events)?raw.events:[]};}catch(e){console.warn("[NEXUS LOTO] load failed",e);return{aceLotos:[],personalLocks:[],events:[]};}}
-  function saveLoto(c,records){localStorage.setItem(lotoKey(c),JSON.stringify(records));window.dispatchEvent(new CustomEvent("nexus:loto-change",{detail:{context:c}}));return records;}\n  function summarizeLoto(records){
+  function saveLoto(c,records){localStorage.setItem(lotoKey(c),JSON.stringify(records));window.dispatchEvent(new CustomEvent("nexus:loto-change",{detail:{context:c}}));return records;}
+  function summarizeLoto(records){
     const active=records.aceLotos.filter(x=>x&&x.status!=="closed");
     const locks=records.personalLocks.filter(x=>x&&x.status!=="removed");
     const people=new Set(locks.map(x=>x.personId||x.personName).filter(Boolean));
