@@ -14,8 +14,8 @@
   function permissionName(layer,action){return(action||"view")+"_"+(layer==="base"?"oneline":layer);}
   function can(layer,action){const hook=window.NEXUS_LAYER_PERMISSIONS;if(!hook)return true;if(hook.superUser===true)return true;return hook[permissionName(layer,action)]!==false;}
   function lotoKey(c){return LOTO_PREFIX+c.projectId+":"+c.buildingId;}
-  function loadLoto(c){try{const raw=JSON.parse(localStorage.getItem(lotoKey(c))||"{}");return{aceLotos:Array.isArray(raw.aceLotos)?raw.aceLotos:[],personalLocks:Array.isArray(raw.personalLocks)?raw.personalLocks:[]};}catch(e){console.warn("[NEXUS LOTO] load failed",e);return{aceLotos:[],personalLocks:[]};}}
-  function summarizeLoto(records){
+  function loadLoto(c){try{const raw=JSON.parse(localStorage.getItem(lotoKey(c))||"{}");return{aceLotos:Array.isArray(raw.aceLotos)?raw.aceLotos:[],personalLocks:Array.isArray(raw.personalLocks)?raw.personalLocks:[],events:Array.isArray(raw.events)?raw.events:[]};}catch(e){console.warn("[NEXUS LOTO] load failed",e);return{aceLotos:[],personalLocks:[],events:[]};}}
+  function saveLoto(c,records){localStorage.setItem(lotoKey(c),JSON.stringify(records));window.dispatchEvent(new CustomEvent("nexus:loto-change",{detail:{context:c}}));return records;}\n  function summarizeLoto(records){
     const active=records.aceLotos.filter(x=>x&&x.status!=="closed");
     const locks=records.personalLocks.filter(x=>x&&x.status!=="removed");
     const people=new Set(locks.map(x=>x.personId||x.personName).filter(Boolean));
@@ -37,7 +37,7 @@
       const s=summarizeLoto(loadLoto(context()));
       drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Read-only operational view</span></div>'+
         '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.ace+'</b><span>ACE LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div></div>'+
-        '<div class="nx-loto-actions"><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
+        '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ Start LOTO</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
     }
     function setLayer(layer){
       if(!LAYERS.includes(layer)||!can(layer,"view"))return;
@@ -48,10 +48,10 @@
       const url=new URL(location.href);if(layer==="base")url.searchParams.delete("layer");else url.searchParams.set("layer",layer);history.replaceState(null,"",url);
       window.dispatchEvent(new CustomEvent("nexus:layerchange",{detail:{layer,owner:OWNERS[layer]}}));
     }
-    drawer.addEventListener("click",e=>{const action=e.target&&e.target.dataset&&e.target.dataset.lotoAction;if(action==="fit"&&window.nexusOneLineWorkspace&&typeof window.nexusOneLineWorkspace.fit==="function")window.nexusOneLineWorkspace.fit();if(action==="find")window.dispatchEvent(new CustomEvent("nexus:loto-find-request"));});
+    drawer.addEventListener("click",e=>{const action=e.target&&e.target.dataset&&e.target.dataset.lotoAction;if(action==="fit"&&window.nexusOneLineWorkspace&&typeof window.nexusOneLineWorkspace.fit==="function")window.nexusOneLineWorkspace.fit();if(action==="find")window.dispatchEvent(new CustomEvent("nexus:loto-find-request"));if(action==="start"&&can("loto","manage"))window.dispatchEvent(new CustomEvent("nexus:loto-start-request"));});
     window.addEventListener("storage",e=>{if(e.key===lotoKey(context())&&document.body.dataset.nexusLayer==="loto")renderDrawer("loto");});
     window.addEventListener("nexus:loto-change",()=>{if(document.body.dataset.nexusLayer==="loto")renderDrawer("loto");});
-    window.NEXUSOneLineLayers={setLayer,can,owners:{...OWNERS},getLayer:()=>document.body.dataset.nexusLayer||"base",loadLoto:()=>loadLoto(context())};
+    window.NEXUSOneLineLayers={setLayer,can,owners:{...OWNERS},getLayer:()=>document.body.dataset.nexusLayer||"base",loadLoto:()=>loadLoto(context()),saveLoto:(records)=>saveLoto(context(),records),context:()=>({...context()})};
     setLayer(getRequestedLayer());
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
