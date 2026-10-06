@@ -6302,6 +6302,17 @@
         fitEquipmentInstance(instance, equipmentIds);
       },
 
+      openEquipment: function openEquipment(equipmentId) {
+        const item = instance.equipment.find(function(equipment) {
+          return getEquipmentId(equipment) === String(equipmentId);
+        });
+        if (instance.callbacks.onOpenEquipment) {
+          instance.callbacks.onOpenEquipment(item || { equipmentId: String(equipmentId) });
+        } else {
+          window.dispatchEvent(new CustomEvent("nexus:open-equipment", { detail: { equipmentId: String(equipmentId), equipment: item || null } }));
+        }
+      },
+
       save: function save() {
         return saveDiagramInstance(instance, true);
       },
