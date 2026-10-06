@@ -1,0 +1,33 @@
+name: NEXUS One-Line Preview
+
+on:
+  push:
+    branches:
+      - feature/layered-operations-ui
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout preview branch
+        uses: actions/checkout@v4
+      - name: Build static preview artifact
+        run: |
+          mkdir -p preview
+          cp -R ./*.html ./*.js ./*.css ./*.png preview/ 2>/dev/null || true
+          cat > preview/PREVIEW_BUILD.txt <<EOF
+          NEXUS One-Line development preview
+          Branch: feature/layered-operations-ui
+          Commit: $GITHUB_SHA
+          Built: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-one-line-preview
+          path: preview
+          retention-days: 30
