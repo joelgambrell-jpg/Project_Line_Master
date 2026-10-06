@@ -1,0 +1,12 @@
+/**
+ * NEXUS LOTO VISUAL STATE
+ * At-a-glance operational badges over the SME-built One-Line.
+ */
+(function(){"use strict";
+function api(){return window.NEXUSOneLineLayers;}
+function node(id){return Array.from(document.querySelectorAll(".nexus-one-line .node")).find(n=>{const x=n.querySelector(".id");return x&&String(x.textContent||"").trim()===String(id);});}
+function clear(){document.querySelectorAll(".nx-loto-visual-badges").forEach(x=>x.remove());document.querySelectorAll(".node.nx-loto-protected,.node.nx-loto-point,.node.nx-loto-people").forEach(n=>n.classList.remove("nx-loto-protected","nx-loto-point","nx-loto-people"));}
+function add(n,label,cls,title){let h=n.querySelector(".nx-loto-visual-badges");if(!h){h=document.createElement("div");h.className="nx-loto-visual-badges";n.appendChild(h);}const b=document.createElement("span");b.className="nx-loto-visual-badge "+cls;b.textContent=label;b.title=title||label;h.appendChild(b);}
+function render(){clear();if(document.body.dataset.nexusLayer!=="loto"||!api())return;const d=api().loadLoto(),active=d.lotos.filter(l=>l&&l.status!=="closed"),locks=d.personalLocks.filter(l=>l&&l.status!=="removed");active.forEach(l=>{(l.boundaryAcceptance&&l.boundaryAcceptance.accepted?l.boundaryAcceptance.downstreamEquipmentIds||[]:[]).forEach(id=>{const n=node(id);if(n){n.classList.add("nx-loto-protected");add(n,"PROTECTED","protected","Inside accepted displayed LOTO boundary");}});(l.isolationPoints||[]).forEach(p=>{const n=node(p.equipmentId);if(n){n.classList.add("nx-loto-point");add(n,"ISOLATION","isolation","Recorded LOTO isolation point"+(p.controlLockId?" · Control lock "+p.controlLockId:""));}});});const by=new Map();locks.forEach(l=>{if(!l.equipmentId)return;const a=by.get(String(l.equipmentId))||[];a.push(l);by.set(String(l.equipmentId),a);});by.forEach((ls,id)=>{const n=node(id);if(!n)return;n.classList.add("nx-loto-people");const people=new Set(ls.map(x=>x.personId||x.personName));add(n,people.size+" PERSON"+(people.size===1?"":"S"),"people",ls.length+" active personal lock"+(ls.length===1?"":"s"));});}
+window.addEventListener("nexus:loto-change",render);window.addEventListener("nexus:layerchange",render);window.addEventListener("nexus:loto-topology-view",render);setTimeout(render,0);
+})();
