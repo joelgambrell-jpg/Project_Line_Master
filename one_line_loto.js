@@ -14,7 +14,7 @@ function lotoForEquipment(data,id){
  return data.lotos.filter(a=>active(a,"closed")&&(
    String(a.equipmentId||"")===id ||
    (Array.isArray(a.equipmentIds)&&a.equipmentIds.map(String).includes(id)) ||
-   (Array.isArray(a.protectedEquipmentIds)&&a.protectedEquipmentIds.map(String).includes(id))
+   (a.boundaryAcceptance&&a.boundaryAcceptance.accepted&&Array.isArray(a.boundaryAcceptance.downstreamEquipmentIds)&&a.boundaryAcceptance.downstreamEquipmentIds.map(String).includes(id))
  ));
 }
 function locksForEquipment(data,id){return data.personalLocks.filter(l=>active(l,"removed")&&String(l.equipmentId||"")===id);}
@@ -30,7 +30,7 @@ function install(root){
    const controlling=lotos[0]||null;
    let html='<header><div><span class="nx-loto-kicker">LOTO EQUIPMENT</span><h2>'+esc(id)+'</h2></div><span class="nx-loto-state '+(controlling||locks.length?"active":"clear")+'">'+(controlling||locks.length?"LOTO ACTIVE":"NO ACTIVE LOTO")+'</span></header>';
    html+='<section class="nx-loto-card"><h3>LOTO CONTROL</h3>';
-   if(controlling){html+='<dl><dt>LOTO</dt><dd>'+esc(controlling.lotoNumber||controlling.id||"Active")+'</dd><dt>LOTO Coordinator</dt><dd>'+esc(controlling.lotoCoordinator||controlling.energyMarshal||controlling.controllingEnergyMarshal||"Not recorded")+'</dd><dt>Isolation Point</dt><dd>'+esc(controlling.isolationPoint||controlling.isolationEquipmentId||"Not recorded")+'</dd></dl>';}else{html+='<p>No active controlling LOTO currently references this equipment.</p>';}html+='</section>';
+   if(controlling){html+='<dl><dt>LOTO</dt><dd>'+esc(controlling.lotoNumber||controlling.id||"Active")+'</dd><dt>LOTO Coordinator</dt><dd>'+esc(controlling.lotoCoordinator||controlling.energyMarshal||controlling.controllingEnergyMarshal||"Not recorded")+'</dd><dt>Stage</dt><dd>'+esc(String(controlling.status||"active").replace(/_/g," ").toUpperCase())+'</dd><dt>Isolation Points</dt><dd>'+esc((controlling.isolationPoints||[]).map(p=>p.equipmentId).filter(Boolean).join(", ")||controlling.isolationPoint||"Not recorded")+'</dd><dt>Boundary</dt><dd>'+(controlling.boundaryAcceptance&&controlling.boundaryAcceptance.accepted?"ACCEPTED":"REVIEW REQUIRED")+'</dd></dl>';}else{html+='<p>No active controlling LOTO currently references this equipment.</p>';}html+='</section>';
    html+='<section class="nx-loto-card"><div class="nx-loto-card-head"><h3>PEOPLE & PERSONAL LOCKS</h3><b>'+people.size+'</b></div>';
    if(!people.size){html+='<p>No active personal locks are recorded on this equipment.</p>';}else{people.forEach(p=>{html+='<div class="nx-loto-person"><div><strong>'+esc(p.name)+'</strong><span>'+esc(p.company||"Company not recorded")+'</span></div><div class="nx-loto-locks">'+p.locks.map(l=>'<span>'+esc(l.lockId||l.lockNumber||"LOCK")+'</span>').join("")+'</div></div>';});}html+='</section>';
    html+='<section class="nx-loto-card nx-loto-source"><h3>ELECTRICAL SOURCE OF TRUTH</h3><p>Equipment identity and electrical relationships come from the SME-built One-Line. This LOTO layer only attaches operational records to that topology.</p></section>';
