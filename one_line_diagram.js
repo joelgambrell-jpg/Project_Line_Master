@@ -6298,6 +6298,10 @@
         fitDiagramInstance(instance);
       },
 
+      getEquipment: function getEquipment() {
+        return instance.equipment.slice();
+      },
+
       fitEquipment: function fitEquipment(equipmentIds) {
         fitEquipmentInstance(instance, equipmentIds);
       },
