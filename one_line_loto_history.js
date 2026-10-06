@@ -12,7 +12,7 @@ function install(){
  const sheet=document.createElement("section");sheet.className="nx-loto-history-sheet";sheet.setAttribute("aria-label","LOTO history");document.body.appendChild(sheet);
  let query="",type="all";
  function close(){sheet.classList.remove("is-open");sheet.innerHTML="";}
- function open(){if(!api()||!api().can("loto","history"))return;sheet.classList.add("is-open");render();}
+ function open(){if(!api()||!api().can("loto","view_history"))return;sheet.classList.add("is-open");render();}
  function matches(e){if(type!=="all"&&e.type!==type)return false;const q=query.trim().toLowerCase();if(!q)return true;return [e.type,e.actor,e.personId,e.personName,e.lotoId,e.lotoNumber,e.equipmentId,e.lockId,e.isolationPoint,e.recordId,e.payload&&e.payload.company].some(v=>String(v||"").toLowerCase().includes(q));}
  function render(){
   if(!sheet.classList.contains("is-open"))return;const d=api().loadLoto(),events=d.events.slice().sort((a,b)=>String(b.timestamp||"").localeCompare(String(a.timestamp||""))).filter(matches);
