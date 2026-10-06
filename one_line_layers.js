@@ -21,7 +21,7 @@
     const locks=records.personalLocks.filter(x=>x&&x.status!=="removed");
     const people=new Set(locks.map(x=>x.personId||x.personName).filter(Boolean));
     const equipment=new Set(locks.map(x=>x.equipmentId).filter(Boolean));
-    return{lotos:active.length,locks:locks.length,people:people.size,equipment:equipment.size};
+    const openIssues=records.events.filter(e=>e&&e.type==="LOTO_ISSUE_FLAGGED"&&e.payload&&e.payload.status==="open"&&!records.events.some(x=>x&&x.type==="LOTO_ISSUE_CLOSED"&&x.payload&&x.payload.issueEventId===e.id));return{lotos:active.length,locks:locks.length,people:people.size,equipment:equipment.size,issues:openIssues.length};
   }
   function install(){
     const host=document.getElementById("oneLineWorkspaceHost");if(!host||document.querySelector(".nx-layer-bar"))return;
@@ -37,7 +37,7 @@
       if(layer==="energization"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Energization</strong><span>Shows confirmed energized state independently from QC completion. Topology remains owned by SME / Engineering.</span></div>';return;}
       const s=summarizeLoto(loadLoto(context()));
       drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Controlled operational layer</span></div>'+
-        '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div></div>'+
+        '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div><div class="nx-loto-attention"><b>'+s.issues+'</b><span>Attention</span></div></div>'+
         '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ Start LOTO</button><button type="button" data-loto-action="add-person">+ Add Person / Lock</button><button type="button" data-loto-action="remove-person">Remove Person / Lock</button><button type="button" data-loto-action="exception-remove">Exceptional Lock Removal</button><button type="button" data-loto-action="isolation">Isolation Points</button><button type="button" data-loto-action="group-box">Group Boxes</button><button type="button" data-loto-action="handoff">Coordinator Handoff</button><button type="button" data-loto-action="issue">Flag Issue</button><button type="button" data-loto-action="issue-review">Review Issues</button><button type="button" data-loto-action="progress">Release / Restore</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="history">History</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div></div>';
     }
     function setLayer(layer){
