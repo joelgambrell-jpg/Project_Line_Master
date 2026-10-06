@@ -5,8 +5,8 @@
  */
 (function(){
   "use strict";
-  const LAYERS=["base","readiness","energization","loto"];
-  const OWNERS={base:"SME / Engineering",readiness:"Quality / Readiness",energization:"Energization",loto:"LOTO Coordinator"};
+  const LAYERS=["base","readiness","energization","loto","everything"];
+  const OWNERS={base:"SME / Engineering",readiness:"Quality / Readiness",energization:"Energization",loto:"LOTO Coordinator",everything:"Multiple operational owners"};
   const LOTO_PREFIX="nexus-one-line-loto-v1:";
   function params(){return new URLSearchParams(location.search);}
   function context(){const q=params();return{projectId:q.get("project")||"sample-project",buildingId:q.get("building")||"A",diagramId:q.get("diagram")||"overall"};}
@@ -28,13 +28,13 @@
     const bar=document.createElement("nav");bar.className="nx-layer-bar";bar.setAttribute("aria-label","One-Line operational layers");
     bar.innerHTML='<span class="nx-layer-label">View Layer</span><div class="nx-layer-tabs"></div><span class="nx-layer-spacer"></span><span class="nx-layer-mode">Data owner: <strong></strong></span>';
     const tabs=bar.querySelector(".nx-layer-tabs");
-    [["base","One-Line"],["readiness","Readiness"],["energization","Energization"],["loto","LOTO"]].forEach(([id,label])=>{const b=document.createElement("button");b.type="button";b.className="nx-layer-tab";b.dataset.layer=id;b.textContent=label;b.disabled=!can(id,"view");b.addEventListener("click",()=>setLayer(id));tabs.appendChild(b);});
+    [["base","One-Line"],["readiness","Readiness"],["energization","Energization"],["loto","LOTO"],["everything","Everything"]].forEach(([id,label])=>{const b=document.createElement("button");b.type="button";b.className="nx-layer-tab";b.dataset.layer=id;b.textContent=label;b.disabled=!can(id,"view");b.addEventListener("click",()=>setLayer(id));tabs.appendChild(b);});
     const drawer=document.createElement("section");drawer.className="nx-layer-drawer";drawer.setAttribute("aria-live","polite");
     host.parentNode.insertBefore(bar,host);host.parentNode.insertBefore(drawer,host);
     function renderDrawer(layer){
       if(layer==="base"){drawer.innerHTML="";return;}
       if(layer==="readiness"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Readiness</strong><span>QC completion status over the approved SME One-Line. Topology remains read-only to this layer.</span></div>';return;}
-      if(layer==="energization"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Energization</strong><span>Shows confirmed energized state independently from QC completion. Topology remains owned by SME / Engineering.</span></div>';return;}
+      if(layer==="everything"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Everything</strong><span>Combined project view: electrical topology, readiness, energization, active LOTO, people/locks, and issues. Use Building / Phase / Area filters to narrow the view.</span></div>';return;}if(layer==="energization"){drawer.innerHTML='<div class="nx-layer-summary"><strong>Energization</strong><span>Shows confirmed energized state independently from QC completion. Topology remains owned by SME / Engineering.</span></div>';return;}
       const s=summarizeLoto(loadLoto(context()));
       drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Controlled operational layer</span></div>'+
         '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div><div class="nx-loto-attention"><b>'+s.issues+'</b><span>Attention</span></div></div>'+
