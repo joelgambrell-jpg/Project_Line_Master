@@ -5325,27 +5325,17 @@
     );
   }
 
-  function fitDiagramInstance(instance) {
+  function fitDiagramInstance(instance, suppliedItems) {
     const svg = instance.elements.svg;
 
     if (!svg) {
       return;
     }
 
-    const items =
-      instance.state.collapsed &&
-      instance.diagramId === "overall"
-        ? [
-            {
-              x: 240,
-              y: 360,
-              w: Math.max(
-                330,
-                getAvailablePhases(instance).length * 410
-              ),
-              h: 150
-            }
-          ]
+    const items = Array.isArray(suppliedItems)
+      ? suppliedItems
+      : instance.state.collapsed && instance.diagramId === "overall"
+        ? [{x:240,y:360,w:Math.max(330,getAvailablePhases(instance).length*410),h:150}]
         : getFitItems(instance);
 
     if (!items.length) {
@@ -5504,6 +5494,13 @@
         instance.transform.scale;
 
     applyTransform(instance);
+  }
+
+  function fitEquipmentInstance(instance, equipmentIds) {
+    const ids = new Set((Array.isArray(equipmentIds) ? equipmentIds : []).map(String));
+    const items = instance.state.nodes.filter(function(node){ return ids.has(String(node.id)); });
+    if (!items.length) { fitDiagramInstance(instance); return; }
+    fitDiagramInstance(instance, items);
   }
 
   function getFitItems(instance) {
@@ -6299,6 +6296,10 @@
 
       fit: function fit() {
         fitDiagramInstance(instance);
+      },
+
+      fitEquipment: function fitEquipment(equipmentIds) {
+        fitEquipmentInstance(instance, equipmentIds);
       },
 
       save: function save() {
