@@ -27,3 +27,9 @@ body[data-nexus-layer="loto"] .one-line-host{margin-right:min(390px,38vw)}
 .nx-loto-step{display:flex;align-items:center;gap:9px;margin:10px 0 7px;font-size:12px;font-weight:900;letter-spacing:.4px}
 .nx-loto-step strong{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#f2c52d;color:#111}
 .nx-loto-step span{color:#f3f4f5}
+
+.nx-loto-plot-banner{position:fixed;z-index:140;left:50%;top:76px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid #f2c52d;border-radius:10px;background:#121416;color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.nx-loto-plot-banner strong{color:#f2c52d}.nx-loto-plot-banner span{font-size:13px}.nx-loto-plot-banner button{min-width:72px;min-height:44px;border:0;border-radius:7px;font-weight:900}
+body.nx-loto-plotting .nexus-one-line .node{cursor:crosshair}
+body.nx-loto-plotting .nexus-one-line .node:hover{outline:4px solid #f2c52d;outline-offset:3px}
+@media(max-width:800px){.nx-loto-plot-banner{top:auto;bottom:12px;left:10px;right:10px;transform:none;flex-wrap:wrap}.nx-loto-plot-banner span{flex:1 1 55%}}
