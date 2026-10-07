@@ -38,7 +38,7 @@
       const s=summarizeLoto(loadLoto(context()));
       drawer.innerHTML='<div class="nx-loto-overview"><div class="nx-loto-title"><strong>LOTO CONTROL</strong><span>Controlled operational layer</span></div>'+
         '<div class="nx-loto-metrics"><div><b>'+s.people+'</b><span>People on LOTO</span></div><div><b>'+s.lotos+'</b><span>Active LOTOs</span></div><div><b>'+s.locks+'</b><span>Personal Locks</span></div><div><b>'+s.equipment+'</b><span>Equipment</span></div><div class="nx-loto-attention"><b>'+s.issues+'</b><span>Attention</span></div></div>'+
-        '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ START LOTO</button><button type="button" data-loto-action="isolation">PLOT / EDIT LOTO POINTS</button><button type="button" data-loto-action="find">Find Person / Equipment</button><button type="button" data-loto-action="history">History</button><button type="button" data-loto-action="fit">Fit Active LOTO</button></div><div class="nx-layer-summary"><strong>Guided LOTO</strong><span>Start here or tap equipment. While plotting isolation points, tap the equipment or breaker directly on the One-Line.</span></div></div>';
+        '<div class="nx-loto-actions"><button type="button" class="nx-loto-start" data-loto-action="start">+ START LOTO</button><button type="button" data-loto-action="find">FIND</button><button type="button" data-loto-action="history">HISTORY</button></div></div>';
     }
     function setLayer(layer){
       if(!LAYERS.includes(layer)||!can(layer,"view"))return;
