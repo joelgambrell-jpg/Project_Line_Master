@@ -23,3 +23,7 @@ body[data-nexus-layer="loto"] .one-line-host{margin-right:min(390px,38vw)}
  body[data-nexus-layer="loto"] .one-line-host{margin-bottom:0}
  .nx-loto-guided-actions{grid-template-columns:1fr}
 }
+
+.nx-loto-step{display:flex;align-items:center;gap:9px;margin:10px 0 7px;font-size:12px;font-weight:900;letter-spacing:.4px}
+.nx-loto-step strong{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#f2c52d;color:#111}
+.nx-loto-step span{color:#f3f4f5}
