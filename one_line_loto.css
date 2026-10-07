@@ -5,3 +5,21 @@
 .nx-loto-person{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #30343a}.nx-loto-person:first-of-type{border-top:0}.nx-loto-person strong,.nx-loto-person span{display:block}.nx-loto-person strong{font-size:13px}.nx-loto-person>div>span{margin-top:2px;color:#939aa3;font-size:10px}.nx-loto-locks{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.nx-loto-locks span{padding:4px 6px;border:1px solid #71693f;border-radius:5px;background:#2b2718;color:#ffe78b!important;font-size:10px!important;font-weight:900}.nx-loto-source{border-color:#2d4a3d}.nx-loto-empty{display:flex;min-height:180px;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed #454a51;border-radius:8px;color:#aeb5bf;padding:20px}.nx-loto-empty strong{color:#fff;margin-bottom:6px}.nx-loto-empty span{font-size:12px;line-height:1.4}
 body[data-nexus-layer="loto"] .one-line-host{margin-right:min(390px,38vw)}
 @media(max-width:800px){.nx-loto-equipment-panel{top:auto;bottom:0;width:100%;height:min(48vh,440px);transform:translateY(102%);border-left:0;border-top:1px solid #3e4248}.nx-loto-equipment-panel.is-open{transform:translateY(0)}body[data-nexus-layer="loto"] .one-line-host{margin-right:0;margin-bottom:min(48vh,440px)}}
+
+
+/* Guided field workflow */
+.nx-loto-equipment-panel{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.nx-loto-guided{border-color:#5c6370}
+.nx-loto-guidance{margin:0 0 12px!important;font-size:14px!important;line-height:1.45!important}
+.nx-loto-guided-status{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;padding:10px;border-radius:8px;background:#111315}
+.nx-loto-guided-status strong{font-size:17px}.nx-loto-guided-status span{font-size:11px;font-weight:900}
+.nx-loto-guided-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nx-loto-guided-actions button,.nx-loto-primary-action{min-height:48px;width:100%;border:1px solid #5b616b;border-radius:8px;background:#24282e;color:#fff;font-weight:900;font-size:14px;cursor:pointer}
+.nx-loto-primary-action{background:#f2c52d;color:#111;border-color:#f2c52d}
+.nx-loto-attn{padding:9px;border-left:4px solid #f2c52d;background:#2a2412}
+.nx-loto-details{opacity:.92}
+@media(max-width:800px){
+ .nx-loto-equipment-panel{height:min(72vh,680px);max-height:72vh;padding-bottom:max(24px,env(safe-area-inset-bottom));overflow-y:auto;touch-action:pan-y}
+ body[data-nexus-layer="loto"] .one-line-host{margin-bottom:0}
+ .nx-loto-guided-actions{grid-template-columns:1fr}
+}
