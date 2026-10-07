@@ -33,3 +33,9 @@ body[data-nexus-layer="loto"] .one-line-host{margin-right:min(390px,38vw)}
 body.nx-loto-plotting .nexus-one-line .node{cursor:crosshair}
 body.nx-loto-plotting .nexus-one-line .node:hover{outline:4px solid #f2c52d;outline-offset:3px}
 @media(max-width:800px){.nx-loto-plot-banner{top:auto;bottom:12px;left:10px;right:10px;transform:none;flex-wrap:wrap}.nx-loto-plot-banner span{flex:1 1 55%}}
+
+.nx-loto-guide{display:none;position:fixed;z-index:160;left:50%;bottom:18px;transform:translateX(-50%);width:min(760px,calc(100vw - 28px));box-sizing:border-box;padding:12px 14px;border:2px solid #f2c52d;border-radius:12px;background:#111419;color:#fff;box-shadow:0 12px 34px rgba(0,0,0,.45);font-family:Arial,sans-serif}
+.nx-loto-guide.is-open{display:flex;align-items:center;justify-content:space-between;gap:14px}.nx-loto-guide>div:first-child{display:flex;flex-direction:column;gap:3px}.nx-loto-guide small{font-weight:900;color:#f2c52d;letter-spacing:1px}.nx-loto-guide strong{font-size:19px}.nx-loto-guide span{font-size:13px;color:#c7cdd4}.nx-guide-actions{display:flex;gap:8px;flex-shrink:0}.nx-guide-actions button{min-height:48px;padding:8px 16px;border:1px solid #626a74;border-radius:8px;background:#252a31;color:#fff;font-weight:900}.nx-guide-actions .primary{background:#f2c52d;color:#111;border-color:#f2c52d}
+body[data-nexus-layer="loto"] .nexus-one-line .node.nx-guide-work{outline:5px solid #fff;outline-offset:4px;opacity:1}
+body[data-nexus-layer="loto"] .nexus-one-line .node.nx-guide-point{outline:5px solid #f2c52d;outline-offset:4px;opacity:1}
+@media(max-width:800px){.nx-loto-guide{bottom:8px}.nx-loto-guide.is-open{align-items:stretch;flex-direction:column}.nx-guide-actions{display:grid;grid-template-columns:1fr}.nx-guide-actions button{width:100%}}
