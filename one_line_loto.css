@@ -66,3 +66,30 @@ body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar{width:
 body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar-thumb{background:#aeb7c3;border:2px solid #24282e;border-radius:10px}
 body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar-track{background:#24282e}
 @media(max-width:800px){body[data-nexus-layer="loto"] .nx-loto-equipment-panel{height:72dvh!important;max-height:72dvh!important;bottom:0;top:auto}}
+
+/* Shared scrolling for LOTO dialogs, history, and field panels. */
+body[data-nexus-layer="loto"] .nx-loto-start-modal.is-open{
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;align-items:safe center;
+}
+body[data-nexus-layer="loto"] .nx-loto-start-modal.is-open .nx-loto-dialog{
+  max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+}
+body[data-nexus-layer="loto"] .nx-loto-history-sheet{
+  max-height:calc(100dvh - 32px);min-height:0;overflow-y:auto;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;
+}
+body[data-nexus-layer="loto"] .nx-loto-guide.is-open{
+  max-height:min(52dvh,460px);overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+}
+body[data-nexus-layer="loto"] .nx-layer-drawer{
+  max-height:min(40dvh,380px);overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+}
+@media(max-width:800px){
+ body[data-nexus-layer="loto"] .nx-loto-start-modal.is-open{padding:8px;align-items:safe center}
+ body[data-nexus-layer="loto"] .nx-loto-start-modal.is-open .nx-loto-dialog{max-height:calc(100dvh - 16px)}
+ body[data-nexus-layer="loto"] .nx-loto-guide.is-open{max-height:48dvh}
+}
