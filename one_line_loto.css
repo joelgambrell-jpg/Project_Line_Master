@@ -54,3 +54,15 @@ body[data-nexus-layer="loto"] .nx-loto-visual-badge{min-height:30px;padding:5px 
 body[data-nexus-layer="loto"] .nx-loto-visual-badge.protected{background:#f2c52d;color:#111;border:1px solid #111}
 body[data-nexus-layer="loto"] .nx-loto-visual-badge.isolation{background:#fff;color:#111;border:1px solid #111}
 body[data-nexus-layer="loto"] .nx-loto-visual-badge.people{background:#20252b;color:#fff;border:2px solid #f2c52d}
+
+/* Scroll repair: fixed field drawer scrolls independently of the diagram. */
+body[data-nexus-layer="loto"] .nx-loto-equipment-panel{
+  overflow-x:hidden!important;overflow-y:scroll!important;
+  scrollbar-width:auto;scrollbar-color:#aeb7c3 #24282e;
+  overscroll-behavior-y:contain;touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+}
+body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar{width:12px}
+body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar-thumb{background:#aeb7c3;border:2px solid #24282e;border-radius:10px}
+body[data-nexus-layer="loto"] .nx-loto-equipment-panel::-webkit-scrollbar-track{background:#24282e}
+@media(max-width:800px){body[data-nexus-layer="loto"] .nx-loto-equipment-panel{height:72dvh!important;max-height:72dvh!important;bottom:0;top:auto}}
