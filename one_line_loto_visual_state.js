@@ -1,12 +1,41 @@
-/**
- * NEXUS LOTO VISUAL STATE
- * At-a-glance operational badges over the SME-built One-Line.
- */
+/* NEXUS LOTO padlocks rendered as native SVG inside One-Line nodes.
+   Operational indication only; never a declaration of electrical safety. */
 (function(){"use strict";
-function api(){return window.NEXUSOneLineLayers;}
-function node(id){return Array.from(document.querySelectorAll(".nexus-one-line .node")).find(n=>{const x=n.querySelector(".id");return x&&String(x.textContent||"").trim()===String(id);});}
-function clear(){document.querySelectorAll(".nx-loto-visual-badges").forEach(x=>x.remove());document.querySelectorAll(".node.nx-loto-protected,.node.nx-loto-point,.node.nx-loto-people").forEach(n=>n.classList.remove("nx-loto-protected","nx-loto-point","nx-loto-people"));}
-function add(n,label,cls,title,detail){let h=n.querySelector(".nx-loto-visual-badges");if(!h){h=document.createElement("div");h.className="nx-loto-visual-badges";n.appendChild(h);}const b=document.createElement("button");b.type="button";b.className="nx-loto-visual-badge "+cls;b.textContent=label;b.title=title||label;b.addEventListener("click",e=>{e.stopPropagation();n.dispatchEvent(new MouseEvent("click",{bubbles:true}));window.dispatchEvent(new CustomEvent("nexus:loto-object-open",{detail:detail||{equipmentId:String((n.querySelector(".id")||{}).textContent||"").trim(),type:cls}}));});h.appendChild(b);}
-function render(){clear();if(document.body.dataset.nexusLayer!=="loto"||!api())return;const d=api().loadLoto(),active=d.lotos.filter(l=>l&&l.status!=="closed"),locks=d.personalLocks.filter(l=>l&&l.status!=="removed");const coverage=new Map();active.forEach(l=>{(l.boundaryAcceptance&&l.boundaryAcceptance.accepted?l.boundaryAcceptance.downstreamEquipmentIds||[]:[]).forEach(id=>{const a=coverage.get(String(id))||[];a.push(l);coverage.set(String(id),a);});(l.boundaryAcceptance&&l.boundaryAcceptance.accepted?l.boundaryAcceptance.downstreamEquipmentIds||[]:[]).forEach(id=>{const n=node(id);if(n){n.classList.add("nx-loto-protected");add(n,"LOTO "+String(l.lotoNumber||"ACTIVE"),"protected","Inside accepted displayed LOTO boundary",{type:"protected-equipment",equipmentId:String(id),lotoId:l.id});}});(l.isolationPoints||[]).forEach(p=>{const n=node(p.equipmentId);if(n){n.classList.add("nx-loto-point");add(n,"ISOLATION · "+String(l.lotoNumber||""),"isolation","Recorded LOTO isolation point"+(p.controlLockId?" · Control lock "+p.controlLockId:""),{type:"isolation-point",equipmentId:String(p.equipmentId),lotoId:l.id,isolationPointId:p.id});}});});coverage.forEach((ls,id)=>{if(ls.length<2)return;const n=node(id);if(n)add(n,ls.length+" ACTIVE LOTOs","overlap","This equipment is inside multiple active Recorded LOTO boundaries",{type:"loto-overlap",equipmentId:id,lotoIds:ls.map(x=>x.id)});});const by=new Map();locks.forEach(l=>{if(!l.equipmentId)return;const a=by.get(String(l.equipmentId))||[];a.push(l);by.set(String(l.equipmentId),a);});by.forEach((ls,id)=>{const n=node(id);if(!n)return;n.classList.add("nx-loto-people");const people=new Set(ls.map(x=>x.personId||x.personName));add(n,people.size+" PERSON"+(people.size===1?"":"S"),"people",ls.length+" active personal lock"+(ls.length===1?"":"s"),{type:"people-locks",equipmentId:String(id),lockIds:ls.map(x=>x.id)});});}
-window.addEventListener("nexus:loto-change",render);window.addEventListener("nexus:layerchange",render);window.addEventListener("nexus:loto-topology-view",render);setTimeout(render,0);
+const NS="http://www.w3.org/2000/svg";
+const api=()=>window.NEXUSOneLineLayers;
+const idOf=n=>String(n.querySelector(".id")?.textContent||"").trim();
+function el(tag,attrs){const n=document.createElementNS(NS,tag);Object.entries(attrs||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));return n;}
+function clear(){document.querySelectorAll(".nx-loto-svg-lock").forEach(n=>n.remove());}
+function badge(node,items){
+ const box=node.getBBox();if(!box.width||!box.height)return;
+ const x=box.x+box.width-13,y=box.y-16;
+ const g=el("g",{class:"nx-loto-svg-lock",transform:"translate("+x+" "+y+")",role:"button",tabindex:"0","aria-label":"LOTO status for "+idOf(node)});
+ g.style.cursor="pointer";
+ const verified=items.some(x=>x.verified),pending=items.some(x=>!x.verified);
+ g.appendChild(el("rect",{x:-3,y:-3,width:items.length>1?43:30,height:39,rx:7,fill:"#16191e",stroke:"#f3c52b","stroke-width":2}));
+ const shackle=el("path",{d:"M5 15 V10 A7 7 0 0 1 19 10 V15",fill:"none",stroke:"#f3c52b","stroke-width":3.5,"stroke-linecap":"round"});
+ g.appendChild(shackle);
+ g.appendChild(el("rect",{x:3,y:14,width:18,height:16,rx:3,fill:verified&&!pending?"#f3c52b":"#16191e",stroke:"#f3c52b","stroke-width":2}));
+ g.appendChild(el("circle",{cx:12,cy:21,r:2,fill:verified&&!pending?"#16191e":"#f3c52b"}));
+ if(items.length>1){const t=el("text",{x:31,y:25,fill:"#fff","font-size":14,"font-weight":900,"text-anchor":"middle"});t.textContent=items.length;g.appendChild(t);}
+ const title=el("title");title.textContent=items.length+" LOTO record(s) — "+(pending?"verification pending":"accepted boundary recorded")+". Not proof of deenergization.";g.appendChild(title);
+ const open=e=>{e.preventDefault();e.stopPropagation();node.dispatchEvent(new MouseEvent("click",{bubbles:true}));window.dispatchEvent(new CustomEvent("nexus:loto-object-open",{detail:{type:"loto-padlock",equipmentId:idOf(node),lotoIds:items.map(x=>x.id)}}));};
+ g.addEventListener("click",open);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" " )open(e);});
+ node.appendChild(g);
+}
+function render(){
+ clear();if(!["loto","everything"].includes(document.body.dataset.nexusLayer)||!api())return;
+ const data=api().loadLoto(),map=new Map();
+ (data.lotos||[]).filter(l=>l&&l.status!=="closed").forEach(l=>{
+   const accepted=!!l.boundaryAcceptance?.accepted;
+   const ids=new Set([l.equipmentId,...(l.equipmentIds||[]),...(l.isolationPoints||[]).map(p=>p.equipmentId),...(accepted?(l.boundaryAcceptance.downstreamEquipmentIds||[]):[])].filter(Boolean).map(String));
+   ids.forEach(id=>{if(!map.has(id))map.set(id,[]);map.get(id).push({id:l.id,verified:accepted});});
+ });
+ document.querySelectorAll(".nexus-one-line .node").forEach(n=>{const records=map.get(idOf(n));if(records?.length){try{badge(n,records);}catch(e){console.warn("[NEXUS LOTO] Could not draw padlock",e);}}});
+}
+let scheduled=false;function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;render();});}
+window.addEventListener("nexus:loto-change",schedule);window.addEventListener("nexus:layerchange",schedule);window.addEventListener("nexus:loto-topology-view",schedule);
+const observer=new MutationObserver(changes=>{if(changes.some(x=>Array.from(x.addedNodes).some(n=>n.nodeType===1&&!n.classList?.contains("nx-loto-svg-lock"))))schedule();});
+function init(){observer.observe(document.body,{childList:true,subtree:true});schedule();}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
