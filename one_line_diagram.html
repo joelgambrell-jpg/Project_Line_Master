@@ -24,6 +24,16 @@
   <link rel="stylesheet" href="one_line_loto_topology_overlay.css?v=1" />
   <link rel="stylesheet" href="one_line_loto_issue_markers.css?v=1" />
   <link rel="stylesheet" href="one_line_breakers.css?v=1" />
+<style id="nexus-loto-modal-critical-fix">
+/* Inline critical layout rules: unaffected by cached external CSS. */
+body .nx-loto-start-modal.is-open{position:fixed!important;inset:0!important;z-index:10000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:12px!important;overflow:auto!important;box-sizing:border-box!important}
+body .nx-loto-start-modal.is-open .nx-loto-dialog{display:flex!important;flex-direction:column!important;width:min(780px,100%)!important;max-height:calc(100dvh - 24px)!important;overflow:hidden!important;margin:auto!important}
+body .nx-loto-start-modal.is-open .nx-loto-dialog>header{flex:none!important}
+body .nx-loto-start-modal.is-open .nx-loto-dialog form{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch;touch-action:pan-y!important}
+body .nx-loto-start-modal.is-open .nx-loto-dialog footer{position:sticky!important;bottom:0!important;z-index:5!important;background:#14171b!important;padding:12px 0!important;border-top:1px solid #444!important}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
+@media(max-height:650px){body .nx-loto-start-modal.is-open{align-items:flex-start!important}}
+</style>
 </head>
 
 <body class="one-line-standalone-page">
