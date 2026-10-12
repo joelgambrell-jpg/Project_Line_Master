@@ -15,6 +15,18 @@ jobs:
     steps:
       - name: Checkout preview branch
         uses: actions/checkout@v4
+      - name: Verify JavaScript syntax
+        run: |
+          for file in ./*.js; do node --check "$file"; done
+          node --check tests/equipment-details.cjs
+      - name: Install browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/nexus-test" playwright
+          "$RUNNER_TEMP/nexus-test/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify equipment inspector in iPad viewport
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/nexus-test/node_modules/playwright
+        run: node tests/equipment-details.cjs
       - name: Build static preview artifact
         run: |
           mkdir -p preview

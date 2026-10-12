@@ -608,6 +608,7 @@
       autoRefreshMs: options.autoRefreshMs,
 
       equipment: normalizeEquipment(options.equipment),
+      equipmentIsSample: options.equipment === sampleEquipment,
 
       callbacks: {
         onOpenEquipment: options.onOpenEquipment,
@@ -3253,6 +3254,10 @@
           );
         }
 
+        let equipmentPointer = null;
+        group.addEventListener("pointerdown", function(event) {
+          equipmentPointer = {x:event.clientX,y:event.clientY};
+        }, true);
         group.addEventListener(
           "click",
           function handleNodeClick(event) {
@@ -3272,6 +3277,7 @@
               node.id,
               event
             );
+            if (!event.shiftKey && !event.ctrlKey && !event.metaKey && (!equipmentPointer || Math.hypot(event.clientX-equipmentPointer.x,event.clientY-equipmentPointer.y)<6)) showEquipmentDetails(instance, node.id);
           }
         );
 
@@ -6050,29 +6056,20 @@
     );
   }
 
+  function showEquipmentDetails(instance, equipmentId) {
+    window.dispatchEvent(new CustomEvent("nexus:equipment-selected", {detail: {
+      equipmentId: String(equipmentId),
+      equipment: instance.equipmentIsSample ? null : getEquipment(instance, equipmentId),
+      context: {projectId:instance.projectId, buildingId:instance.buildingId, diagramId:instance.diagramId}
+    }}));
+  }
+
   function openEquipment(instance, equipmentId) {
     if (!equipmentId) {
       return;
     }
 
-    if (instance.callbacks.onOpenEquipment) {
-      instance.callbacks.onOpenEquipment(
-        equipmentId,
-        getEquipment(instance, equipmentId)
-      );
-
-      return;
-    }
-
-    const url =
-      "equipment.html?eq=" +
-      encodeURIComponent(equipmentId);
-
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    showEquipmentDetails(instance, equipmentId);
   }
 
   function createWorkspaceUrl(instance) {
@@ -6360,6 +6357,7 @@
   }
 
   function setEquipmentInstance(instance, equipment) {
+    instance.equipmentIsSample = false;
     instance.equipment = normalizeEquipment(
       Array.isArray(equipment)
         ? equipment

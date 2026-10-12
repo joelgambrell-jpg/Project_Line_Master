@@ -34,16 +34,10 @@ body .nx-loto-start-modal.is-open .nx-loto-dialog footer{position:sticky!importa
 body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
 @media(max-height:650px){body .nx-loto-start-modal.is-open{align-items:flex-start!important}}
 </style>
+<link rel="stylesheet" href="one_line_equipment_details.css?v=1" />
 </head>
 
 <body class="one-line-standalone-page">
-  <section id="nexusIntegratedEquipment" hidden role="region" aria-label="Selected equipment" style="position:fixed;right:16px;top:80px;z-index:9999;background:#19222b;color:#fff;padding:16px;border:1px solid #6c7883;border-radius:10px;max-width:min(360px,90vw);box-shadow:0 8px 30px #0009">
-    <button type="button" aria-label="Close equipment panel" onclick="this.parentNode.hidden=true" style="float:right;cursor:pointer">✕</button>
-    <strong>Selected equipment</strong>
-    <p data-equipment-id style="overflow-wrap:anywhere"></p>
-    <p style="font-size:13px;color:#c6d0d9">Use the One-Line operational tabs for readiness, energization, and LOTO. This panel does not claim equipment-level QC records are connected.</p>
-    <button type="button" onclick="window.NEXUSOneLineLayers?.setLayer('loto')">Open LOTO layer</button>
-  </section>
   <main
     id="oneLineWorkspaceHost"
     class="one-line-host"
@@ -91,7 +85,8 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
 </script>
 <script src="one_line_firebase_adapter.js?v=1"></script>
 -->
-<script src="one_line_diagram.js?v=10"></script>
+<script src="one_line_diagram.js?v=11"></script>
+<script src="one_line_equipment_details.js?v=1"></script>
 <script src="one_line_readiness.js?v=3"></script>
 <script src="one_line_readiness_hotfix.js?v=3"></script>
 <script src="one_line_display_identity.js?v=4"></script>
@@ -99,7 +94,7 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
 <script src="one_line_layers.js?v=20261008-3"></script>
 <script src="one_line_filters.js?v=1"></script>
 <script src="one_line_breakers.js?v=1"></script>
-<script src="one_line_loto.js?v=20261012-scroll"></script>
+<script src="one_line_loto.js?v=20261012-syntax"></script>
 <script src="one_line_loto_people.js?v=1"></script>
 <script src="one_line_loto_workflow.js?v=1"></script>
 <script src="one_line_loto_group_box.js?v=1"></script>
@@ -265,11 +260,7 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
               window.dispatchEvent(new CustomEvent("nexus:equipment-selected", {
                 detail: { equipmentId: equipmentId }
               }));
-              const panel = document.getElementById("nexusIntegratedEquipment");
-              if (panel) {
-                panel.hidden = false;
-                panel.querySelector("[data-equipment-id]").textContent = equipmentId;
-              }
+
             },
 
             onSave: function handleDiagramSave(saveResult) {
