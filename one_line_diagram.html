@@ -27,6 +27,13 @@
 </head>
 
 <body class="one-line-standalone-page">
+  <section id="nexusIntegratedEquipment" hidden role="region" aria-label="Selected equipment" style="position:fixed;right:16px;top:80px;z-index:9999;background:#19222b;color:#fff;padding:16px;border:1px solid #6c7883;border-radius:10px;max-width:min(360px,90vw);box-shadow:0 8px 30px #0009">
+    <button type="button" aria-label="Close equipment panel" onclick="this.parentNode.hidden=true" style="float:right;cursor:pointer">✕</button>
+    <strong>Selected equipment</strong>
+    <p data-equipment-id style="overflow-wrap:anywhere"></p>
+    <p style="font-size:13px;color:#c6d0d9">Use the One-Line operational tabs for readiness, energization, and LOTO. This panel does not claim equipment-level QC records are connected.</p>
+    <button type="button" onclick="window.NEXUSOneLineLayers?.setLayer('loto')">Open LOTO layer</button>
+  </section>
   <main
     id="oneLineWorkspaceHost"
     class="one-line-host"
@@ -243,8 +250,16 @@
                 return;
               }
 
-              const url = "equipment.html?eq=" + encodeURIComponent(equipmentId);
-              window.open(url, "_blank", "noopener,noreferrer");
+              // Equipment is handled in the integrated workspace. Never open
+              // the nonexistent equipment.html route.
+              window.dispatchEvent(new CustomEvent("nexus:equipment-selected", {
+                detail: { equipmentId: equipmentId }
+              }));
+              const panel = document.getElementById("nexusIntegratedEquipment");
+              if (panel) {
+                panel.hidden = false;
+                panel.querySelector("[data-equipment-id]").textContent = equipmentId;
+              }
             },
 
             onSave: function handleDiagramSave(saveResult) {
