@@ -23,6 +23,7 @@ function install(root){
  const panel=document.createElement("aside");panel.className="nx-loto-equipment-panel";panel.setAttribute("aria-live","polite");panel.innerHTML='<div class="nx-loto-empty"><strong>Select equipment</strong><span>Tap equipment on the One-Line to inspect its LOTO relationship.</span></div>';
  document.body.appendChild(panel);
  function render(){
+   const previousScroll=panel.scrollTop;
    const isLoto=document.body.dataset.nexusLayer==="loto";panel.classList.toggle("is-open",isLoto);if(!isLoto)return;
    const id=selectedId(root);if(!id){panel.innerHTML='<div class="nx-loto-empty"><strong>Select equipment</strong><span>Tap equipment on the One-Line to inspect its LOTO relationship.</span></div>';return;}
    const data=records(),lotos=lotoForEquipment(data,id),locks=locksForEquipment(data,id),people=new Map();
@@ -34,7 +35,7 @@ function install(root){
    html+='<section class="nx-loto-card"><div class="nx-loto-card-head"><h3>PEOPLE & PERSONAL LOCKS</h3><b>'+people.size+'</b></div>';
    if(!people.size){html+='<p>No active personal locks are recorded on this equipment.</p>';}else{people.forEach(p=>{html+='<div class="nx-loto-person"><div><strong>'+esc(p.name)+'</strong><span>'+esc(p.company||"Company not recorded")+'</span></div><div class="nx-loto-locks">'+p.locks.map(l=>'<span>'+esc(l.lockId||l.lockNumber||"LOCK")+'</span>').join("")+'</div></div>';});}html+='</section>';
    html+='<section class="nx-loto-card nx-loto-source"><h3>ELECTRICAL SOURCE OF TRUTH</h3><p>Equipment identity and electrical relationships come from the SME-built One-Line. This LOTO layer only attaches operational records to that topology.</p></section>';
-   panel.innerHTML=html;
+   if(panel.innerHTML!==html){panel.innerHTML=html;panel.scrollTop=previousScroll;}
  }
  panel.addEventListener("click",e=>{const g=e.target.closest("[data-guided-action]");if(g){const a=g.dataset.guidedAction;if(a==="start")window.dispatchEvent(new CustomEvent("nexus:loto-start-request"));if(a==="add-person")window.dispatchEvent(new CustomEvent("nexus:loto-add-person-request"));if(a==="remove-person")window.dispatchEvent(new CustomEvent("nexus:loto-remove-person-request"));if(a==="continue")window.dispatchEvent(new CustomEvent("nexus:loto-isolation-request"));return;}const b=e.target.closest("[data-open-nexus]");if(!b)return;const id=b.dataset.openNexus;if(window.nexusOneLineWorkspace&&typeof window.nexusOneLineWorkspace.openEquipment==="function")window.nexusOneLineWorkspace.openEquipment(id);else window.dispatchEvent(new CustomEvent("nexus:open-equipment",{detail:{equipmentId:id}}));});
  const obs=new MutationObserver(()=>requestAnimationFrame(render));obs.observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:["class","data-equipment-id"]});
