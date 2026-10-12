@@ -28,6 +28,7 @@ const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || "playwrigh
  for(const viewport of [{width:768,height:1024},{width:1024,height:768},{width:1440,height:900}]) {
  await page.setViewportSize(viewport);
  for(const layer of ["base","readiness","energization","loto","everything"]){
+  console.log("CHECK",browserName,viewport.width+"x"+viewport.height,layer);
   await page.evaluate(layer=>window.NEXUSOneLineLayers.setLayer(layer),layer);
   await page.evaluate(()=>window.nexusOneLineWorkspace.fitEquipment(["1A01A"]));
   await page.locator(".node").filter({has:page.locator(".id",{hasText:"1A01A"})}).first().tap();

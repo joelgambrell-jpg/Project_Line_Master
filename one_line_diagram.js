@@ -5620,7 +5620,10 @@
       y: event.clientY
     });
 
-    if (instance.elements.viewport.setPointerCapture) {
+    // Keep a one-finger tap targeted at its equipment node. Capturing it
+    // on the viewport or cancelling pointerdown prevents Safari's click.
+    // CSS touch-action:none and pointermove handle the pan gesture.
+    if (instance.touchPointers.size >= 2 && instance.elements.viewport.setPointerCapture) {
       try {
         instance.elements.viewport.setPointerCapture(event.pointerId);
       } catch (error) {
@@ -5629,8 +5632,6 @@
     }
 
     if (instance.touchPointers.size === 1 && instance.mode === "view" && instance.viewerOnly) {
-      event.preventDefault();
-
       instance.pan = {
         startX: event.clientX,
         startY: event.clientY,
