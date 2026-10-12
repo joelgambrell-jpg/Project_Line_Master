@@ -24,7 +24,7 @@ function badge(node,items){
  node.appendChild(g);
 }
 function render(){
- clear();if(!["loto","everything"].includes(document.body.dataset.nexusLayer)||!api())return;
+ clear();if(!api())return;
  const data=api().loadLoto(),map=new Map();
  (data.lotos||[]).filter(l=>l&&l.status!=="closed").forEach(l=>{
    const accepted=!!l.boundaryAcceptance?.accepted;
@@ -33,7 +33,7 @@ function render(){
  });
  document.querySelectorAll(".nexus-one-line .node").forEach(n=>{const records=map.get(idOf(n));if(records?.length){try{badge(n,records);}catch(e){console.warn("[NEXUS LOTO] Could not draw padlock",e);}}});
 }
-function legend(){let bar=document.querySelector(".nx-loto-map-legend");if(!["loto","everything"].includes(document.body.dataset.nexusLayer)){bar?.remove();return;}if(!bar){bar=document.createElement("div");bar.className="nx-loto-map-legend";bar.setAttribute("role","status");bar.style.cssText="display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:9px 14px;background:#181e26;color:#f3f5f7;border:1px solid #48535f;border-radius:8px;margin:8px 0;font:600 13px system-ui;";const host=document.getElementById("oneLineWorkspaceHost");if(host?.parentNode)host.parentNode.insertBefore(bar,host);}bar.innerHTML='<strong>VISUAL STATUS</strong><span style="color:#f3c52b">♧ OUTLINED PADLOCK — pending</span><span style="color:#f3c52b">■ SOLID PADLOCK — boundary accepted</span><span>Number — overlapping LOTOs</span><small style="opacity:.75">Recorded status only · Verify physical condition</small>';}
+function legend(){let bar=document.querySelector(".nx-loto-map-legend");if(!api()){bar?.remove();return;}if(!bar){bar=document.createElement("div");bar.className="nx-loto-map-legend";bar.setAttribute("role","status");bar.style.cssText="display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:9px 14px;background:#181e26;color:#f3f5f7;border:1px solid #48535f;border-radius:8px;margin:8px 0;font:600 13px system-ui;";const host=document.getElementById("oneLineWorkspaceHost");if(host?.parentNode)host.parentNode.insertBefore(bar,host);}bar.innerHTML='<strong>VISUAL STATUS</strong><span style="color:#f3c52b">♧ OUTLINED PADLOCK — pending</span><span style="color:#f3c52b">■ SOLID PADLOCK — boundary accepted</span><span>Number — overlapping LOTOs</span><small style="opacity:.75">Recorded status only · Verify physical condition</small>';}
 let scheduled=false;function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;render();legend();});}
 window.addEventListener("nexus:loto-change",schedule);window.addEventListener("nexus:layerchange",schedule);window.addEventListener("nexus:loto-topology-view",schedule);
 const observer=new MutationObserver(changes=>{if(changes.some(x=>Array.from(x.addedNodes).some(n=>n.nodeType===1&&!n.classList?.contains("nx-loto-svg-lock"))))schedule();});
