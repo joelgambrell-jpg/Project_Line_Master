@@ -30,8 +30,9 @@ const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || "playwrigh
  for(const layer of ["base","readiness","energization","loto","everything"]){
   console.log("CHECK",browserName,viewport.width+"x"+viewport.height,layer);
   await page.evaluate(layer=>window.NEXUSOneLineLayers.setLayer(layer),layer);
-  await page.evaluate(()=>window.nexusOneLineWorkspace.fitEquipment(["1A01A"]));
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await page.evaluate(()=>window.nexusOneLineWorkspace.fitEquipment(["1A01A"]));
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
   if(browserName==="WebKit")console.log("LAYOUT",JSON.stringify(await page.evaluate(()=>{
    const selectors=[".one-line-host",".one-line-view-shell",".one-line-view-toolbar",".canvas-wrap",".canvas-viewport",'svg[data-role="diagram-svg"]',".node",".nx-display-identity"];
    return {errors:window.__testErrors||[],size:[innerWidth,innerHeight],scroll:[scrollX,scrollY],elements:selectors.map(selector=>{

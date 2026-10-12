@@ -23,3 +23,7 @@ body.nx-equipment-popout-enabled .nx-loto-equipment-panel{display:none!important
 body.nx-equipment-popout-enabled[data-nexus-layer="loto"] .one-line-host{margin-right:0!important;margin-bottom:0!important}
 body.nx-equipment-popout-enabled .nx-loto-guide:not([data-guided-active="true"]){display:none!important}
 @media(max-height:600px){.nx-equipment-dialog>header{padding:10px 16px}.nx-equipment-notice{font-size:12px;padding:8px 16px}.nx-equipment-dialog>footer{padding:8px 16px}}
+
+/* Safari resolves percentage-height SVGs to their intrinsic 150px height
+   inside this flex layout. Anchor the drawing to the measured viewport. */
+body.nx-equipment-popout-enabled .nexus-one-line[data-mode="view"] .canvas-viewport > svg[data-role="diagram-svg"]{position:absolute;inset:0;width:100%;height:100%}
