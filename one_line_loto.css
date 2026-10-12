@@ -108,3 +108,29 @@ body[data-nexus-layer="loto"] .nx-loto-equipment-panel{
   height:min(72dvh,680px)!important;max-height:72dvh!important;
  }
 }
+
+/* Modal-open state: guided banner must never obstruct form submission. */
+body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-start-modal{
+ z-index:1000;inset:0;box-sizing:border-box;display:flex;
+ align-items:flex-start!important;justify-content:center;
+ padding:16px max(12px,env(safe-area-inset-right)) 16px max(12px,env(safe-area-inset-left));
+ overflow-y:auto!important;overflow-x:hidden!important;
+ overscroll-behavior:contain;touch-action:pan-y;
+}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-dialog{
+ flex:0 1 780px;width:min(780px,100%)!important;
+ max-height:calc(100dvh - 32px)!important;min-height:0;
+ display:flex;flex-direction:column;overflow:hidden!important;
+ margin:auto 0;
+}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-dialog>header{flex:0 0 auto}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-dialog form{
+ min-height:0;overflow-y:auto!important;overscroll-behavior:contain;
+ -webkit-overflow-scrolling:touch;touch-action:pan-y;
+ padding-bottom:max(18px,env(safe-area-inset-bottom));
+}
+body:has(.nx-loto-start-modal.is-open) .nx-loto-dialog footer{
+ position:sticky;bottom:-1px;z-index:2;padding:12px 0 4px;
+ background:#14171b;border-top:1px solid #373b41;
+}
