@@ -93,3 +93,18 @@ body[data-nexus-layer="loto"] .nx-layer-drawer{
  body[data-nexus-layer="loto"] .nx-loto-start-modal.is-open .nx-loto-dialog{max-height:calc(100dvh - 16px)}
  body[data-nexus-layer="loto"] .nx-loto-guide.is-open{max-height:48dvh}
 }
+
+/* Fixed LOTO detail drawer must remain inside the visible viewport. */
+body[data-nexus-layer="loto"] .nx-loto-equipment-panel{
+ box-sizing:border-box;top:0;bottom:auto;right:0;
+ height:100dvh!important;max-height:100dvh!important;
+ width:min(390px,100vw);max-width:100vw;
+ overflow-y:auto!important;overflow-x:hidden!important;
+}
+@media(max-width:800px){
+ body[data-nexus-layer="loto"] .nx-loto-equipment-panel{
+  top:auto;bottom:0;right:0;left:0;
+  width:100vw;max-width:100vw;
+  height:min(72dvh,680px)!important;max-height:72dvh!important;
+ }
+}
