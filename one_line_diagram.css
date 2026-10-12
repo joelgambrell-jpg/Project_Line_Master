@@ -938,3 +938,15 @@ svg[data-role="diagram-svg"] {
   body.one-line-standalone-page .workspace.pool-hidden { grid-template-columns: minmax(0,1fr); }
   body.one-line-standalone-page .control-strip { max-width: 100%; overflow-x: auto; }
 }
+
+/* LOTO editor: use all available width rather than reserving a blank right gutter. */
+@media(min-width:801px){
+ body[data-nexus-layer="loto"] .one-line-host{width:100%;max-width:100%;margin-right:0!important}
+ body[data-nexus-layer="loto"] .workspace{width:100%;max-width:100%;grid-template-columns:minmax(220px,260px) minmax(0,1fr) minmax(260px,320px)}
+ body[data-nexus-layer="loto"] .workspace.pool-hidden{grid-template-columns:minmax(0,1fr) minmax(260px,320px)}
+ body[data-nexus-layer="loto"] .workspace .canvas-wrap{min-width:0}
+}
+@media(min-width:801px) and (max-width:1200px){
+ body[data-nexus-layer="loto"] .workspace{grid-template-columns:minmax(190px,230px) minmax(0,1fr)}
+ body[data-nexus-layer="loto"] .workspace.pool-hidden{grid-template-columns:minmax(0,1fr)}
+}
