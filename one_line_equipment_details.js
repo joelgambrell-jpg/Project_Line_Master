@@ -57,6 +57,14 @@ function render() {
  html+=section("Recorded energization",energy && Object.prototype.hasOwnProperty.call(energy,id) ? fields(energy[id]) : "<p>Unknown — no persisted energization record. Absence does not establish a de-energized state.</p>");
  if(permitted) {
  html+=section("All associated LOTO records",empty(associated,l=>"<article>"+fields(l)+"</article>"));
+ // Keep the existing LOTO workflows reachable after retiring their sidebar.
+ const activeLotos=associated.filter(l=>String(l.status||"").toLowerCase()!=="closed");
+ if(activeLotos.length && api) {
+  const buttons=[];
+  if(api.can("loto","participate"))buttons.push('<button type="button" data-equipment-workflow="add-person">Add person / lock</button>','<button type="button" data-equipment-workflow="remove-person">Remove person / lock</button>');
+  if(api.can("loto","manage"))buttons.push('<button type="button" data-equipment-workflow="isolation">Manage isolation points</button>');
+  if(buttons.length)html+=section("LOTO actions",'<div class="nx-equipment-actions">'+buttons.join("")+'</div>');
+ }
  html+=section("People currently recorded on LOTO",empty(current,l=>"<article><h4>"+esc(l.personName||l.personId||"Unknown person")+"</h4><p>Lock applied: "+time(l.appliedAt)+"</p>"+fields(l)+"</article>"));
  html+=section("Removed locks / other lock history",empty(history,l=>"<article><p>Applied: "+time(l.appliedAt)+"</p><p>Removed: "+time(l.removedAt)+"</p>"+fields(l)+"</article>"));
  html+=section("Isolation points",empty(associated,l=>"<article><h4>"+esc(l.lotoNumber||l.id)+"</h4>"+empty(list(l.isolationPoints),fields)+(l.isolationPoint?"<p>"+esc(l.isolationPoint)+"</p>":"")+section("Recorded boundary snapshot",fields(l.boundaryAcceptance))+"</article>"));
@@ -74,14 +82,23 @@ function open(detail) {
  if(!c)return;
  selected={...detail,context:c};
  if(!dialog.open){previousFocus=document.activeElement;dialog.showModal();document.body.classList.add("nx-equipment-open");}
- render();dialog.querySelector("[data-close]").focus();
+ render();dialog.querySelector("[data-equipment-close]").focus();
 }
 function install() {
  dialog=document.createElement("dialog");dialog.className="nx-equipment-dialog";
  dialog.setAttribute("aria-labelledby","nx-equipment-title");
- dialog.innerHTML='<header><div><small>EQUIPMENT RECORDS</small><h2 id="nx-equipment-title"></h2></div><button type="button" data-close aria-label="Close equipment details">Close</button></header><p class="nx-equipment-notice">Recorded information only. This display does not establish physical isolation, absence of voltage, or safety to work. Missing dates are unknown.</p><div class="nx-equipment-body"></div>';
+ dialog.innerHTML='<header><div><small>EQUIPMENT RECORDS</small><h2 id="nx-equipment-title"></h2></div><button type="button" data-equipment-close aria-label="Close equipment details">× Close</button></header><p class="nx-equipment-notice">Recorded information only. This display does not establish physical isolation, absence of voltage, or safety to work. Missing dates are unknown.</p><div class="nx-equipment-body"></div><footer><button type="button" data-equipment-close>Close · Back to diagram</button></footer>';
  document.body.appendChild(dialog);
- dialog.querySelector("[data-close]").addEventListener("click",close);
+ document.body.classList.add("nx-equipment-popout-enabled");
+ dialog.querySelectorAll("[data-equipment-close]").forEach(button=>button.addEventListener("click",close));
+ dialog.addEventListener("click",e=>{
+  const button=e.target.closest("[data-equipment-workflow]");
+  if(!button)return;
+  const action=button.dataset.equipmentWorkflow;
+  const equipmentId=selected && selected.equipmentId;
+  close();
+  window.dispatchEvent(new CustomEvent("nexus:loto-"+action+"-request",{detail:{equipmentId}}));
+ });
  dialog.addEventListener("cancel",e=>{e.preventDefault();close();});
  dialog.addEventListener("click",e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});
  window.addEventListener("nexus:equipment-selected",e=>open(e.detail));
