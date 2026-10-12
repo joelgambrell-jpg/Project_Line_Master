@@ -18,7 +18,7 @@ function time(v) {
  "<br><small>UTC: "+esc(d.toISOString())+" · Stored timestamp: "+esc(v)+"</small>";
 }
 function fields(o) {
- if (!o || typeof o !== "object") return "<p>No persisted details available.</p>";
+ if (!o || typeof o !== "object" || !Object.keys(o).length) return "<p>No persisted details available.</p>";
  return "<dl>"+Object.entries(o).map(([k,v])=>"<dt>"+esc(k)+"</dt><dd>"+
  (/At$|timestamp$|date$/i.test(k) ? time(v) : v && typeof v==="object" ? "<pre>"+esc(JSON.stringify(v,null,2))+"</pre>" : esc(v == null || v === "" ? "Unknown" : v))+"</dd>").join("")+"</dl>";
 }
@@ -46,7 +46,7 @@ function render() {
  const associated=lotos.filter(l=>ids.has(String(l.id)));
  const linkedLocks=locks.filter(l=>eq(l.equipmentId,id)||ids.has(String(l.lotoId)));
  const lockIds=new Set(linkedLocks.map(l=>String(l.id)));
- const audit=events.filter(e=>eq(e.equipmentId,id)||ids.has(String(e.lotoId))||lockIds.has(String(e.recordId)));
+ const audit=events.filter(e=>eq(e.equipmentId,id)||ids.has(String(e.lotoId))||ids.has(String(e.recordId))||lockIds.has(String(e.recordId)));
  const current=linkedLocks.filter(l=>String(l.status||"").toLowerCase()==="active"&&!l.removedAt);
  const history=linkedLocks.filter(l=>!current.includes(l));
  const energy=read("nexus-one-line-energized-v1:"+c.projectId+":"+c.buildingId);

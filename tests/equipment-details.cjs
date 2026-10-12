@@ -35,6 +35,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
   await page.keyboard.press("Escape");
   assert.equal(await popup.isVisible(),false);
  }
+ await page.evaluate(()=>window.nexusOneLineWorkspace.setEquipment([{equipmentId:"1A01A",type:"UPS",progress:{percent:75},qcStatus:"Pending review"}]));
+ await page.evaluate(()=>window.nexusOneLineWorkspace.openEquipment("1A01A"));
+ assert((await page.locator(".nx-equipment-dialog").innerText()).includes("Pending review"),"controller must use shared equipment data");
+ await page.keyboard.press("Escape");
  assert.deepEqual(errors,[]);
  console.log("PASS: all five layers, persisted LOTO association, UTC/missing dates, sample exclusion, iPad scrolling, Escape; no browser errors.");
  }finally{await browser.close();server.close();}

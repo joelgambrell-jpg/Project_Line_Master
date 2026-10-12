@@ -3285,6 +3285,7 @@
           "dblclick",
           function handleNodeDoubleClick(event) {
             event.stopPropagation();
+            if (canEdit(instance) && instance.tool === "connect") return;
             openEquipment(instance, node.id);
           }
         );
@@ -6304,14 +6305,7 @@
       },
 
       openEquipment: function openEquipment(equipmentId) {
-        const item = instance.equipment.find(function(equipment) {
-          return getEquipmentId(equipment) === String(equipmentId);
-        });
-        if (instance.callbacks.onOpenEquipment) {
-          instance.callbacks.onOpenEquipment(item || { equipmentId: String(equipmentId) });
-        } else {
-          window.dispatchEvent(new CustomEvent("nexus:open-equipment", { detail: { equipmentId: String(equipmentId), equipment: item || null } }));
-        }
+        showEquipmentDetails(instance, equipmentId);
       },
 
       save: function save() {
@@ -6392,6 +6386,7 @@
     }
 
     if (Array.isArray(supplied.equipment)) {
+      instance.equipmentIsSample = false;
       instance.equipment = normalizeEquipment(
         supplied.equipment
       );
