@@ -19,3 +19,16 @@ body[data-nexus-layer="loto"] .nexus-one-line .node{opacity:.72}
 body[data-nexus-layer="loto"] .nexus-one-line .connection{opacity:.5}
 @media(max-width:900px){.nx-loto-overview{grid-template-columns:1fr}.nx-loto-actions button{min-height:44px}.nx-loto-metrics{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:800px){.nx-layer-bar{align-items:flex-start;flex-wrap:wrap}.nx-layer-label{width:100%}.nx-layer-tabs{width:100%}.nx-layer-tab{flex:1;min-width:88px;min-height:44px}.nx-layer-mode{width:100%}.nx-loto-metrics{grid-template-columns:repeat(2,1fr)}}
+
+/* LOTO-specific fit: summary wraps instead of forcing the diagram wider. */
+body[data-nexus-layer="loto"] .nx-layer-bar{min-width:0;max-width:100%;flex-wrap:wrap}
+body[data-nexus-layer="loto"] .nx-layer-tabs{min-width:0;max-width:100%;flex-wrap:wrap}
+body[data-nexus-layer="loto"] .nx-layer-drawer{box-sizing:border-box;width:100%;min-width:0;max-width:100%;max-height:none;overflow:visible}
+body[data-nexus-layer="loto"] .nx-loto-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
+body[data-nexus-layer="loto"] .nx-loto-metrics{grid-template-columns:repeat(auto-fit,minmax(112px,1fr));min-width:0}
+body[data-nexus-layer="loto"] .nx-loto-actions{flex-wrap:wrap}
+body[data-nexus-layer="loto"] .nx-loto-actions button{flex:1 1 120px}
+@media(max-width:800px){
+ body[data-nexus-layer="loto"] .nx-layer-mode{white-space:normal}
+ body[data-nexus-layer="loto"] .nx-loto-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
