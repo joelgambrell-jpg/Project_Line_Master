@@ -16,7 +16,7 @@ const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || "playwrigh
  const browser=await browserType.launch();
  try{
  const page=await browser.newPage({viewport:{width:768,height:1024},isMobile:true,hasTouch:true});
- const errors=[];page.on("pageerror",e=>errors.push(e.message));
+ const errors=[];page.on("pageerror",e=>{errors.push(e.message);console.log("BROWSER ERROR",browserName,e.message);});
  await page.addInitScript(()=>{
  localStorage.setItem("nexus-one-line-loto-v1:sample-project:A",JSON.stringify({
  lotos:[{id:"L1",equipmentIds:["1A01A"],status:"active",isolationPoints:[{equipmentId:"1A02A"}]},{id:"L2",equipmentId:"1A01A",status:"closed"}],
@@ -31,7 +31,16 @@ const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || "playwrigh
   console.log("CHECK",browserName,viewport.width+"x"+viewport.height,layer);
   await page.evaluate(layer=>window.NEXUSOneLineLayers.setLayer(layer),layer);
   await page.evaluate(()=>window.nexusOneLineWorkspace.fitEquipment(["1A01A"]));
-  await page.locator(".node").filter({has:page.locator(".id",{hasText:"1A01A"})}).first().tap();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  if(browserName==="WebKit")console.log("LAYOUT",JSON.stringify(await page.evaluate(()=>{
+   const selectors=[".one-line-host",".one-line-view-shell",".one-line-view-toolbar",".canvas-wrap",".canvas-viewport",'svg[data-role="diagram-svg"]',".node",".nx-display-identity"];
+   return {errors:window.__testErrors||[],size:[innerWidth,innerHeight],scroll:[scrollX,scrollY],elements:selectors.map(selector=>{
+    const el=document.querySelector(selector);if(!el)return {selector,missing:true};
+    const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+    return {selector,rect:[r.x,r.y,r.width,r.height],display:style.display,position:style.position,transform:el.getAttribute("transform")};
+   })};
+  })));
+  await page.locator(".node").filter({has:page.locator(".id",{hasText:"1A01A"})}).first().tap({timeout:10000});
   const popup=page.locator(".nx-equipment-dialog");
   await popup.waitFor({state:"visible"});
   const text=await popup.innerText();
