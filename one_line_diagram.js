@@ -3254,6 +3254,8 @@
           );
         }
 
+        // Distinguish an equipment tap from a completed drag, even if
+        // pointerup re-renders the SVG before the browser synthesizes click.
         let equipmentPointer = null;
         group.addEventListener("pointerdown", function(event) {
           equipmentPointer = {x:event.clientX,y:event.clientY};
@@ -3277,7 +3279,11 @@
               node.id,
               event
             );
-            if (!event.shiftKey && !event.ctrlKey && !event.metaKey && (!equipmentPointer || Math.hypot(event.clientX-equipmentPointer.x,event.clientY-equipmentPointer.y)<6)) showEquipmentDetails(instance, node.id);
+            const isTap = !equipmentPointer || Math.hypot(event.clientX-equipmentPointer.x,event.clientY-equipmentPointer.y) < 8;
+            if (!event.shiftKey && !event.ctrlKey && !event.metaKey && isTap &&
+                !window.NEXUS_LOTO_POINT_SELECTION_ACTIVE) {
+              showEquipmentDetails(instance, node.id);
+            }
           }
         );
 
