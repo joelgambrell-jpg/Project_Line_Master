@@ -3,7 +3,9 @@ name: NEXUS One-Line Preview
 on:
   push:
     branches:
+      - main
       - feature/layered-operations-ui
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -16,9 +18,9 @@ jobs:
       - name: Checkout preview branch
         uses: actions/checkout@v4
       - name: Verify JavaScript syntax
-        run: |
-          for file in ./*.js; do node --check "$file"; done
-          node --check tests/equipment-details.cjs
+        run: node scripts/check-syntax.cjs
+      - name: Verify cache-buster stamps are current
+        run: node scripts/stamp-versions.cjs --check
       - name: Install browser test runtime
         run: |
           npm install --prefix "$RUNNER_TEMP/nexus-test" playwright
@@ -33,7 +35,7 @@ jobs:
           cp -R ./*.html ./*.js ./*.css ./*.png preview/ 2>/dev/null || true
           cat > preview/PREVIEW_BUILD.txt <<EOF
           NEXUS One-Line development preview
-          Branch: feature/layered-operations-ui
+          Branch: ${{ github.head_ref || github.ref_name }}
           Commit: $GITHUB_SHA
           Built: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
           EOF
