@@ -4591,7 +4591,8 @@
     instance.drag = {
       mode: "move",
       start: startingPoint,
-      items
+      items,
+      moved: false
     };
 
     bindTemporaryDragEvents(instance);
@@ -4666,16 +4667,14 @@
     };
 
     const endHandler = function endHandler() {
-      window.removeEventListener(
-        "pointermove",
-        moveHandler
-      );
-
-      window.removeEventListener(
-        "pointerup",
-        endHandler
-      );
-
+      window.removeEventListener("pointermove", moveHandler);
+      window.removeEventListener("pointerup", endHandler);
+      // A stationary click must not rebuild the node before the browser
+      // dispatches click; doing so destroys its target and loses the popup.
+      if (instance.drag && !instance.drag.moved) {
+        instance.drag = null;
+        return;
+      }
       endDrag(instance);
     };
 
@@ -4701,6 +4700,8 @@
       event.clientX,
       event.clientY
     );
+    if (Math.hypot(point.x - instance.drag.start.x, point.y - instance.drag.start.y) < 3 && !instance.drag.moved) return;
+    instance.drag.moved = true;
 
     if (instance.drag.mode === "move") {
       instance.drag.items.forEach(
