@@ -3273,17 +3273,14 @@
               return;
             }
 
-            selectItem(
-              instance,
-              "node",
-              node.id,
-              event
-            );
+            // Open the inspector before selectItem() rebuilds the SVG node.
+            // The previous order removed the clicked element during its click event.
             const isTap = !equipmentPointer || Math.hypot(event.clientX-equipmentPointer.x,event.clientY-equipmentPointer.y) < 8;
             if (!event.shiftKey && !event.ctrlKey && !event.metaKey && isTap &&
                 !window.NEXUS_LOTO_POINT_SELECTION_ACTIVE) {
               showEquipmentDetails(instance, node.id);
             }
+            selectItem(instance, "node", node.id, event);
           }
         );
 
