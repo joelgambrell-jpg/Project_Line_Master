@@ -9,21 +9,13 @@
 
   <title>NEXUS One-Line Diagram</title>
 
-  <link rel="stylesheet" href="one_line_diagram.css?v=20261012-loto-fit2" />
-  <link rel="stylesheet" href="one_line_readiness.css?v=3" />
-  <link rel="stylesheet" href="one_line_field_compact.css?v=4" />
-  <link rel="stylesheet" href="one_line_unplaced_pool.css?v=1" />
-  <link rel="stylesheet" href="one_line_layers.css?v=20261012-4" />
-  <link rel="stylesheet" href="one_line_loto.css?v=20261012-modal-scroll" />
-  <link rel="stylesheet" href="one_line_loto_people.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_workflow.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_personal_lock.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_release.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_history.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_isolation.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_topology_overlay.css?v=1" />
-  <link rel="stylesheet" href="one_line_loto_issue_markers.css?v=1" />
-  <link rel="stylesheet" href="one_line_breakers.css?v=1" />
+  <link rel="stylesheet" href="one_line_diagram.css?v=13e3a776" />
+  <link rel="stylesheet" href="one_line_readiness.css?v=70c20b49" />
+  <link rel="stylesheet" href="one_line_field_compact.css?v=d08b71b4" />
+  <link rel="stylesheet" href="one_line_unplaced_pool.css?v=0e71362f" />
+  <link rel="stylesheet" href="one_line_layers.css?v=e2ba526e" />
+  <link rel="stylesheet" href="one_line_loto.css?v=9fe6afde" />
+  <link rel="stylesheet" href="one_line_breakers.css?v=f5c35cbb" />
 <style id="nexus-loto-modal-critical-fix">
 /* Inline critical layout rules: unaffected by cached external CSS. */
 body .nx-loto-start-modal.is-open{position:fixed!important;inset:0!important;z-index:10000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:12px!important;overflow:auto!important;box-sizing:border-box!important}
@@ -34,7 +26,7 @@ body .nx-loto-start-modal.is-open .nx-loto-dialog footer{position:sticky!importa
 body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
 @media(max-height:650px){body .nx-loto-start-modal.is-open{align-items:flex-start!important}}
 </style>
-<link rel="stylesheet" href="one_line_equipment_details.css?v=20261012-popout4" />
+<link rel="stylesheet" href="one_line_equipment_details.css?v=f7ca20c0" />
 </head>
 
 <body class="one-line-standalone-page">
@@ -63,8 +55,8 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
   4. one_line_diagram.js provides the existing editor/viewer engine.
   5. one_line_readiness.js provides readiness colors and engineer/SME
      energized controls without replacing the core renderer.
-  6. one_line_readiness_hotfix.js applies readiness colors to internally
-     supplied sample data and after redraws.
+  6. (merged into one_line_readiness.js) readiness colors are re-applied to
+     internally supplied sample data and after redraws.
   7. one_line_display_identity.js provides the compact field header,
      floating Fit/zoom controls, and stronger phase identification.
   8. one_line_field_compact.css maximizes the field-view canvas while
@@ -76,41 +68,27 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
   No existing editor, viewer, storage, navigation, gesture, Mini Map,
   Properties, or Firebase integration behavior is intentionally removed.
 -->
-<script src="firebase-config.template.js?v=1"></script>
-<script src="one_line_storage.js?v=9"></script>
-<script src="one_line_auth.js?v=1"></script>
+<script src="firebase-config.template.js?v=b9a2f113"></script>
+<script src="one_line_storage.js?v=5393c360"></script>
+<script src="one_line_auth.js?v=9f98a121"></script>
 <!-- FUTURE FIREBASE HOOK — intentionally disabled:
 <script>
   window.NEXUS_ONE_LINE_USE_FIREBASE = true;
 </script>
 <script src="one_line_firebase_adapter.js?v=1"></script>
 -->
-<script src="one_line_diagram.js?v=20261012-touch-popout3"></script>
-<script src="one_line_equipment_details.js?v=20261012-popout2"></script>
-<script src="one_line_readiness.js?v=3"></script>
-<script src="one_line_readiness_hotfix.js?v=3"></script>
-<script src="one_line_display_identity.js?v=4"></script>
-<script src="one_line_unplaced_pool.js?v=1"></script>
-<script src="one_line_layers.js?v=20261008-3"></script>
-<script src="one_line_filters.js?v=1"></script>
-<script src="one_line_breakers.js?v=1"></script>
+<script src="one_line_diagram.js?v=ae8ba9de"></script>
+<script src="one_line_equipment_details.js?v=a595bd68"></script>
+<script src="one_line_readiness.js?v=efaf8c1a"></script>
+<script src="one_line_display_identity.js?v=f670e934"></script>
+<script src="one_line_unplaced_pool.js?v=a78d15dd"></script>
+<script src="one_line_layers.js?v=1095cb1c"></script>
+<script src="one_line_filters.js?v=376203e4"></script>
+<script src="one_line_breakers.js?v=2e24e3bb"></script>
 <!-- Equipment details are handled by the shared pop-out, not the legacy LOTO sidebar. -->
-<script src="one_line_loto_people.js?v=1"></script>
-<script src="one_line_loto_workflow.js?v=1"></script>
-<script src="one_line_loto_group_box.js?v=1"></script>
-<script src="one_line_loto_personal_lock.js?v=1"></script>
-<script src="one_line_loto_release.js?v=1"></script>
-<script src="one_line_loto_history.js?v=1"></script>
-<script src="one_line_loto_topology.js?v=1"></script>
-<script src="one_line_loto_isolation.js?v=1"></script>
-<script src="one_line_loto_plot.js?v=1"></script>
-<script src="one_line_loto_guided.js?v=20261012-popout2"></script>
-<script src="one_line_loto_active_people.js?v=1"></script>
-<script src="one_line_loto_issue.js?v=1"></script>
-<script src="one_line_loto_handoff.js?v=1"></script>
-<script src="one_line_loto_topology_overlay.js?v=1"></script>
-<script src="one_line_loto_issue_markers.js?v=1"></script>
-<script src="one_line_loto_visual_state.js?v=20261012-all-layers"></script>
+<script src="one_line_loto_workflow.js?v=4f84fb94"></script>
+<script src="one_line_loto_isolation.js?v=30912537"></script>
+<script src="one_line_loto_visuals.js?v=893cc2ea"></script>
 
   <script>
     (function initializeOneLineWorkspace() {
@@ -141,7 +119,7 @@ body:has(.nx-loto-start-modal.is-open) .nx-loto-guide{display:none!important}
         fileHelp.textContent =
           "Required files: one_line_diagram.html, one_line_diagram.css, " +
           "one_line_diagram.js, one_line_readiness.css, one_line_readiness.js, " +
-          "one_line_readiness_hotfix.js, one_line_display_identity.js, " +
+          "one_line_display_identity.js, " +
           "one_line_field_compact.css, one_line_unplaced_pool.js, " +
           "one_line_unplaced_pool.css, and one_line_storage.js.";
 

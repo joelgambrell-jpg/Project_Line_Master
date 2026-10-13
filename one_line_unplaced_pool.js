@@ -1,3 +1,6 @@
+/* NEXUS One-Line equipment pool (pool + completion-key cleanups)
+ * Consolidated from: one_line_unplaced_pool.js, one_line_completion_key_cleanup.js, one_line_sidebar_completion_cleanup.js.
+ * Parts run in the original load order. */
 /**
  * NEXUS ONE-LINE EQUIPMENT POOL SIMPLIFICATION
  * =============================================
@@ -175,21 +178,7 @@
       document.head.appendChild(script);
     }
 
-    if (!document.querySelector('script[data-nx-completion-cleanup="1"]')) {
-      const cleanup = document.createElement("script");
-      cleanup.src = "one_line_completion_key_cleanup.js?v=1";
-      cleanup.defer = true;
-      cleanup.dataset.nxCompletionCleanup = "1";
-      document.head.appendChild(cleanup);
-    }
 
-    if (!document.querySelector('script[data-nx-sidebar-completion-cleanup="1"]')) {
-      const sidebarCleanup = document.createElement("script");
-      sidebarCleanup.src = "one_line_sidebar_completion_cleanup.js?v=1";
-      sidebarCleanup.defer = true;
-      sidebarCleanup.dataset.nxSidebarCompletionCleanup = "1";
-      document.head.appendChild(sidebarCleanup);
-    }
   }
 
   function scan() {
@@ -207,6 +196,265 @@
 
   const pageObserver = new MutationObserver(scan);
   pageObserver.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+})();
+;
+/* ---- one_line_completion_key_cleanup.js ---- */
+/**
+ * NEXUS COMPLETION KEY CLEANUP
+ * Engineering editor only.
+ *
+ * Keeps the movable completion key on the diagram, including when collapsed,
+ * and removes the duplicate legacy Completion legend from the right sidebar.
+ */
+(function initializeNexusCompletionKeyCleanup() {
+  "use strict";
+
+  function isEditorPage() {
+    return new URLSearchParams(window.location.search).get("mode") !== "view";
+  }
+
+  function normalize(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function removeSidebarCompletion(root) {
+    const wrap = root.querySelector(".properties-wrap");
+    if (!wrap) return;
+
+    const headings = Array.from(
+      wrap.querySelectorAll("h1,h2,h3,h4,h5,h6,legend,.section-title,.panel-title,strong")
+    );
+
+    headings.forEach(function inspectHeading(heading) {
+      if (normalize(heading.textContent).toLowerCase() !== "completion") return;
+      if (heading.closest(".nx-smart-health")) return;
+
+      let section = heading;
+      while (section.parentElement && section.parentElement !== wrap) {
+        section = section.parentElement;
+      }
+
+      if (section !== wrap && !section.classList.contains("nx-smart-health")) {
+        section.remove();
+      }
+    });
+
+    Array.from(wrap.children).forEach(function inspectDirectChild(child) {
+      if (child.classList.contains("nx-smart-health")) return;
+      const text = normalize(child.textContent);
+      if (
+        /^Completion(?:\s|$)/i.test(text) &&
+        /100% Complete/i.test(text) &&
+        /No Data/i.test(text)
+      ) {
+        child.remove();
+      }
+    });
+  }
+
+  function keepDiagramKeyVisible(root) {
+    const legend = root.querySelector(".canvas-viewport .nx-canvas-legend");
+    if (!legend) return;
+
+    legend.hidden = false;
+    legend.removeAttribute("hidden");
+
+    const close = legend.querySelector(".nx-legend-close");
+    if (close) close.remove();
+
+    const restore = root.querySelector(".nx-key-restore");
+    if (restore) restore.remove();
+
+    try {
+      const parameters = new URLSearchParams(window.location.search);
+      const key = [
+        "nexus-one-line-key",
+        parameters.get("project") || "sample-project",
+        parameters.get("building") || "A",
+        parameters.get("diagram") || "overall"
+      ].join(":");
+      const state = JSON.parse(localStorage.getItem(key) || "{}");
+      state.hidden = false;
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (error) {
+      /* localStorage can be unavailable in restricted browser modes. */
+    }
+  }
+
+  function apply(root) {
+    removeSidebarCompletion(root);
+    keepDiagramKeyVisible(root);
+  }
+
+  function install(root) {
+    if (!root || root.dataset.completionKeyCleanupInstalled === "1") return;
+    root.dataset.completionKeyCleanupInstalled = "1";
+
+    apply(root);
+
+    let queued = false;
+    const observer = new MutationObserver(function queueCleanup() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function runCleanup() {
+        queued = false;
+        apply(root);
+      });
+    });
+
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "hidden"]
+    });
+  }
+
+  function scan() {
+    if (!isEditorPage()) return;
+    document.querySelectorAll(".nexus-one-line").forEach(install);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scan, { once: true });
+  } else {
+    scan();
+  }
+
+  new MutationObserver(scan).observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+})();
+;
+/* ---- one_line_sidebar_completion_cleanup.js ---- */
+/**
+ * NEXUS ONE-LINE SIDEBAR COMPLETION CLEANUP
+ * ==========================================
+ * Engineering editor only.
+ *
+ * The core diagram renderer owns a legacy Completion legend in the right
+ * sidebar. The active completion key now lives on the diagram canvas, so this
+ * module removes only that duplicate sidebar legend whenever the renderer
+ * creates or redraws it.
+ *
+ * It does not modify the Mini Map, Project Summary, Selected Object,
+ * Properties controls, or the floating canvas Completion Key.
+ */
+(function initializeSidebarCompletionCleanup() {
+  "use strict";
+
+  function isEditorPage() {
+    return new URLSearchParams(window.location.search).get("mode") !== "view";
+  }
+
+  function normalizedText(element) {
+    return String((element && element.textContent) || "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isLegacyCompletionLegend(element) {
+    if (!element || element.classList.contains("nx-canvas-legend")) return false;
+    if (element.closest && element.closest(".nx-canvas-legend")) return false;
+
+    const text = normalizedText(element);
+    return (
+      /^Completion(?:\s|$)/i.test(text) &&
+      /100% Complete/i.test(text) &&
+      /51[–-]99% Complete/i.test(text) &&
+      /1[–-]50% Complete/i.test(text) &&
+      /0% Complete/i.test(text) &&
+      /No Data/i.test(text)
+    );
+  }
+
+  function findRemovalTarget(legend) {
+    let current = legend;
+
+    while (current && current.parentElement) {
+      const parent = current.parentElement;
+      const parentText = normalizedText(parent);
+
+      /*
+       * Stop before reaching a container that also owns Project Summary,
+       * Mini Map, Selected Object, or unrelated Properties content.
+       */
+      if (
+        /Project Summary/i.test(parentText) ||
+        /Mini Map/i.test(parentText) ||
+        /Selected Object/i.test(parentText) ||
+        /Building Overview/i.test(parentText)
+      ) {
+        break;
+      }
+
+      if (isLegacyCompletionLegend(parent)) {
+        current = parent;
+        continue;
+      }
+
+      break;
+    }
+
+    return current;
+  }
+
+  function removeDuplicateLegend(root) {
+    if (!root) return;
+
+    const candidates = Array.from(
+      root.querySelectorAll("section, article, fieldset, div")
+    );
+
+    candidates.forEach(function inspect(candidate) {
+      if (!candidate.isConnected || !isLegacyCompletionLegend(candidate)) return;
+
+      const target = findRemovalTarget(candidate);
+      if (target && target.isConnected) {
+        target.remove();
+      }
+    });
+  }
+
+  function install(root) {
+    if (!root || root.dataset.sidebarCompletionCleanup === "1") return;
+    root.dataset.sidebarCompletionCleanup = "1";
+
+    removeDuplicateLegend(root);
+
+    let queued = false;
+    const observer = new MutationObserver(function handleSidebarRedraw() {
+      if (queued) return;
+      queued = true;
+
+      window.requestAnimationFrame(function cleanAfterRedraw() {
+        queued = false;
+        removeDuplicateLegend(root);
+      });
+    });
+
+    observer.observe(root, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  function scan() {
+    if (!isEditorPage()) return;
+    document.querySelectorAll(".nexus-one-line").forEach(install);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scan, { once: true });
+  } else {
+    scan();
+  }
+
+  new MutationObserver(scan).observe(document.documentElement, {
     childList: true,
     subtree: true
   });

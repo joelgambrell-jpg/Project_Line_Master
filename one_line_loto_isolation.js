@@ -1,3 +1,23 @@
+/* LOTO topology, isolation and guided plot
+ * Consolidated from: one_line_loto_topology.js, one_line_loto_isolation.js, one_line_loto_plot.js, one_line_loto_guided.js.
+ * Parts run in the original load order. */
+/* ---- one_line_loto_topology.js ---- */
+/**
+ * NEXUS LOTO TOPOLOGY ADVISORY
+ * Rule: connection.from = upstream/source, connection.to = downstream/load.
+ * This visualizes recorded topology only. It does not determine electrical safety.
+ */
+(function(){"use strict";
+function getState(){const w=window.nexusOneLineWorkspace;return w&&typeof w.getState==="function"?w.getState():null;}
+function build(){const s=getState()||{},cs=Array.isArray(s.connections)?s.connections:[],out=new Map();cs.forEach(c=>{const a=String(c.from||""),b=String(c.to||"");if(!a||!b)return;if(!out.has(a))out.set(a,[]);out.get(a).push(b);});return{connections:cs,out};}
+function reach(start,g){const seen=new Set(),q=[String(start||"")];while(q.length){const n=q.shift();if(!n||seen.has(n))continue;seen.add(n);(g.out.get(n)||[]).forEach(x=>{if(!seen.has(x))q.push(x);});}return seen;}
+function analyze(loto){const g=build(),pts=Array.isArray(loto&&loto.isolationPoints)?loto.isolationPoints:[],iso=new Set(pts.map(p=>String(p.equipmentId||"")).filter(Boolean)),covered=new Set(),perPoint=[];pts.forEach(p=>{const r=reach(p.equipmentId,g);r.forEach(x=>covered.add(x));perPoint.push({isolationPointId:p.id,equipmentId:p.equipmentId,downstreamEquipmentIds:Array.from(r)});});
+const incoming=[];g.connections.forEach(c=>{const from=String(c.from||""),to=String(c.to||"");if(!covered.has(to)||covered.has(from)||iso.has(to))return;incoming.push({connectionId:String(c.id||""),from,to});});
+return{directionRule:"from=upstream/source,to=downstream/load",downstreamEquipmentIds:Array.from(covered),perPoint,additionalIncomingConnections:incoming};}
+window.NEXUSLotoTopology={getState,analyze};
+})();
+;
+/* ---- one_line_loto_isolation.js ---- */
 /**
  * NEXUS ROLLING LOTO ISOLATION POINTS
  * Each point is independently identified, control-locked, and QEW verified de-energized.
@@ -35,4 +55,54 @@ function install(){
  window.addEventListener("nexus:loto-isolation-request",open);window.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("is-open"))close();});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
+})();
+;
+/* ---- one_line_loto_plot.js ---- */
+(function(){
+"use strict";
+let activeLotoId="";
+function api(){return window.NEXUSOneLineLayers;}
+function uid(p){return p+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7);}
+function now(){return new Date().toISOString();}
+function equipmentId(node){const x=node&&node.querySelector(".id");return x?String(x.textContent||"").trim():"";}
+function stop(){activeLotoId="";document.body.classList.remove("nx-loto-plotting");document.querySelectorAll(".nx-loto-plot-banner").forEach(x=>x.remove());}
+function start(e){
+ const a=api();if(!a)return;const d=a.loadLoto(),open=d.lotos.filter(x=>x&&x.status!=="closed");if(!open.length)return;
+ const requested=e&&e.detail&&e.detail.lotoId;const l=open.find(x=>x.id===requested)||open[0];activeLotoId=l.id;document.body.classList.add("nx-loto-plotting");
+ let b=document.querySelector(".nx-loto-plot-banner");if(!b){b=document.createElement("div");b.className="nx-loto-plot-banner";document.body.appendChild(b);}
+ b.innerHTML="<strong>PLOT LOTO POINTS</strong><span>Tap equipment on the One-Line to add an isolation point.</span><button type='button'>DONE</button>";b.querySelector("button").onclick=stop;
+}
+document.addEventListener("click",function(e){
+ if(!activeLotoId)return;const node=e.target.closest(".nexus-one-line .node");if(!node)return;
+ e.preventDefault();e.stopPropagation();const eq=equipmentId(node);if(!eq)return;const a=api(),d=a.loadLoto(),l=d.lotos.find(x=>x.id===activeLotoId&&x.status!=="closed");if(!l)return;
+ if(!Array.isArray(l.isolationPoints))l.isolationPoints=[];if(l.isolationPoints.some(p=>p&&String(p.equipmentId)===eq))return;
+ const t=now(),actor=l.lotoCoordinator||"LOTO Coordinator",p={id:uid("isolation"),equipmentId:eq,status:"identified",identifiedAt:t,identifiedBy:actor,locked:false,verifiedDeenergized:false};
+ l.isolationPoints.push(p);l.boundaryAcceptance={accepted:false,invalidatedAt:t,invalidatedBy:actor,invalidationReason:"Isolation point added from One-Line"};
+ d.events.push({id:uid("event"),type:"ISOLATION_POINT_IDENTIFIED",timestamp:t,actor,layer:"loto",recordId:p.id,lotoId:l.id,lotoNumber:l.lotoNumber,equipmentId:eq,payload:{note:"Plotted from One-Line"}});
+ a.saveLoto(d);node.classList.add("nx-loto-isolation");window.dispatchEvent(new CustomEvent("nexus:loto-isolation-request",{detail:{lotoId:l.id}}));
+},true);
+window.addEventListener("nexus:loto-plot-request",start);
+window.addEventListener("nexus:layerchange",e=>{if(!e.detail||e.detail.layer!=="loto")stop();});
+})();
+;
+/* ---- one_line_loto_guided.js ---- */
+(function(){
+"use strict";
+let mode="",draft=null,activeId="";
+function api(){return window.NEXUSOneLineLayers}
+function uid(p){return p+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)}
+function now(){return new Date().toISOString()}
+function idOf(n){const x=n&&n.querySelector(".id");return x?String(x.textContent||"").trim():""}
+function bar(){let b=document.querySelector(".nx-loto-guide");if(!b){b=document.createElement("section");b.className="nx-loto-guide";document.body.appendChild(b)}return b}
+function clearMarks(){document.querySelectorAll(".nx-guide-work,.nx-guide-point").forEach(n=>n.classList.remove("nx-guide-work","nx-guide-point"))}
+function show(title,text,actions,step){const b=bar(),s=step||0;b.dataset.guidedActive=String(s>0&&s<5);b.innerHTML="<div class='nx-guide-progress'>"+[1,2,3,4,5].map((x,i)=>"<span class='"+(x<s?"done":x===s?"current":"")+"'>"+(x<s?"✓":x)+"<small>"+["EQUIPMENT","INFO","POINTS","VERIFY","ACTIVE"][i]+"</small></span>").join("")+"</div><div class='nx-guide-copy'><small>GUIDED LOTO</small><strong>"+title+"</strong><span>"+text+"</span></div><div class='nx-guide-actions'>"+actions+"</div>";b.classList.add("is-open")}
+function idle(){mode="";draft=null;activeId="";clearMarks();show("Start a LOTO","Five guided steps. NEXUS keeps you on the One-Line.","<button data-g='start' class='primary'>START LOTO</button>",0)}
+function chooseWork(){mode="work";clearMarks();show("Select work equipment","Tap the equipment on the One-Line that the LOTO will protect.","<button data-g='cancel'>CANCEL</button>",1)}
+function details(eq){const number=prompt("LOTO #:", "");if(!number)return idle();const coordinator=prompt("LOTO Coordinator:","");if(!coordinator)return idle();const scope=prompt("Work / scope description:","");if(!scope)return idle();const t=now(),id=uid("loto"),d=api().loadLoto();const l={id,lotoNumber:number.trim(),status:"active",equipmentId:eq,equipmentIds:[eq],isolationPoints:[],lotoCoordinator:coordinator.trim(),scope:scope.trim(),createdAt:t,createdBy:coordinator.trim(),ownerLayer:"loto"};d.lotos.push(l);d.events.push({id:uid("event"),type:"LOTO_CREATED",timestamp:t,actor:l.lotoCoordinator,layer:"loto",recordId:id,lotoId:id,lotoNumber:l.lotoNumber,equipmentId:eq,payload:{scope:l.scope,status:"active"}});api().saveLoto(d);activeId=id;mode="points";show("Plot isolation points","LOTO info saved. Tap each isolation point directly on the One-Line.","<button data-g='cancel'>CANCEL</button><button data-g='done-points' class='primary'>DONE PLOTTING</button>",3)}
+function addPoint(eq,node){const d=api().loadLoto(),l=d.lotos.find(x=>x.id===activeId);if(!l)return idle();if(!Array.isArray(l.isolationPoints))l.isolationPoints=[];if(l.isolationPoints.some(p=>String(p.equipmentId)===eq)){l.isolationPoints=l.isolationPoints.filter(p=>String(p.equipmentId)!==eq);node.classList.remove("nx-guide-point")}else{const t=now(),p={id:uid("isolation"),equipmentId:eq,status:"identified",identifiedAt:t,identifiedBy:l.lotoCoordinator,locked:false,verifiedDeenergized:false};l.isolationPoints.push(p);node.classList.add("nx-guide-point");d.events.push({id:uid("event"),type:"ISOLATION_POINT_IDENTIFIED",timestamp:t,actor:l.lotoCoordinator,layer:"loto",recordId:p.id,lotoId:l.id,lotoNumber:l.lotoNumber,equipmentId:eq,payload:{note:"Plotted from guided One-Line flow"}})}l.boundaryAcceptance={accepted:false,invalidatedAt:now(),invalidatedBy:l.lotoCoordinator,invalidationReason:"Isolation points changed"};api().saveLoto(d)}
+function review(){mode="";const d=api().loadLoto(),l=d.lotos.find(x=>x.id===activeId);if(!l)return idle();show("Verify isolation","Isolation points are plotted. Complete the required lock, path, EM, and QEW verification.","<button data-g='edit-points'>EDIT POINTS</button><button data-g='verify' class='primary'>VERIFY ISOLATION</button>",4)}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-g]");if(g){const a=g.dataset.g;if(a==="start")chooseWork();if(a==="cancel")idle();if(a==="done-points")review();if(a==="edit-points"){mode="points";show("Plot isolation points","Tap a point to add it. Tap a plotted point again to remove it.","<button data-g='done-points' class='primary'>DONE PLOTTING</button>",3)}if(a==="verify")window.dispatchEvent(new CustomEvent("nexus:loto-isolation-request",{detail:{lotoId:activeId}}));return}if(document.body.dataset.nexusLayer!=="loto"||!mode)return;const n=e.target.closest(".nexus-one-line .node");if(!n)return;const eq=idOf(n);if(!eq)return;e.preventDefault();e.stopPropagation();if(mode==="work"){n.classList.add("nx-guide-work");details(eq)}else if(mode==="points")addPoint(eq,n)},true);
+window.addEventListener("nexus:layerchange",e=>{if(e.detail&&e.detail.layer==="loto")idle();else{const b=document.querySelector(".nx-loto-guide");if(b)b.classList.remove("is-open")}});
+window.addEventListener("nexus:loto-start-request",chooseWork);
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{if(document.body.dataset.nexusLayer==="loto")idle()});else if(document.body.dataset.nexusLayer==="loto")idle();
 })();
