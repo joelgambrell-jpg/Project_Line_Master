@@ -5788,11 +5788,16 @@
   }
 
   function startPan(instance, event) {
+    // Empty canvas can be dragged with the primary mouse button in Edit
+    // and LOTO views; equipment still uses its own drag handler.
+    const onEquipment = !!(event.target && event.target.closest &&
+      event.target.closest(".node,.label,.zone,.connection,[data-tool]"));
     const shouldPan =
       instance.mode === "view" ||
       event.button === 1 ||
       event.button === 2 ||
-      event.shiftKey;
+      event.shiftKey ||
+      (event.button === 0 && !onEquipment);
 
     if (!shouldPan) {
       return;
