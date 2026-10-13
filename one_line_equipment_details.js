@@ -78,7 +78,7 @@ function close() {if(!dialog || !dialog.open)return;dialog.close();selected=null
 function open(detail) {
  if(!detail || !detail.equipmentId)return;
  const api=window.NEXUSOneLineLayers;
- const c=detail.context||(api&&api.context());
+ const c=detail.context||(api&&typeof api.context==="function"&&api.context())||{projectId:new URLSearchParams(location.search).get("project")||"sample-project",buildingId:new URLSearchParams(location.search).get("building")||"A",diagramId:new URLSearchParams(location.search).get("diagram")||"overall"};
  if(!c)return;
  selected={...detail,context:c};
  if(!dialog.open){previousFocus=document.activeElement;dialog.showModal();document.body.classList.add("nx-equipment-open");}
