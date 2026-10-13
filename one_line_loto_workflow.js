@@ -29,9 +29,9 @@ function install(){
  modal.addEventListener("click",e=>{if(e.target===modal||e.target.closest("[data-cancel]"))close();});
  modal.addEventListener("submit",e=>{
   e.preventDefault();const form=e.target;if(!form.reportValidity())return;const fd=new FormData(form),createdAt=now(),id=uid("loto"),actor=String(fd.get("lotoCoordinator")||"").trim();
-  const record={id,lotoNumber:String(fd.get("lotoNumber")||"").trim(),status:"active",equipmentId:String(fd.get("equipmentId")||"").trim(),equipmentIds:[String(fd.get("equipmentId")||"").trim()],isolationPoint:"",isolationPoints:[],lotoCoordinator:actor,scope:String(fd.get("scope")||"").trim(),fieldVerificationRecorded:true,createdAt,createdBy:actor,ownerLayer:"loto"};
-  const d=api().loadLoto();d.lotos.push(record);d.events.push({id:uid("event"),type:"LOTO_CREATED",timestamp:createdAt,actor,layer:"loto",recordId:id,lotoNumber:record.lotoNumber,equipmentId:record.equipmentId,payload:{scope:record.scope,status:"active"}});
-  api().saveLoto(d);close();setTimeout(()=>window.dispatchEvent(new CustomEvent("nexus:loto-isolation-request",{detail:{lotoId:id,equipmentId:record.equipmentId}})),0);
+  const record={id,lotoNumber:String(fd.get("lotoNumber")||"").trim(),status:"draft",equipmentId:String(fd.get("equipmentId")||"").trim(),equipmentIds:[String(fd.get("equipmentId")||"").trim()],isolationPoint:"",isolationPoints:[],lotoCoordinator:actor,scope:String(fd.get("scope")||"").trim(),fieldVerificationRecorded:true,createdAt,createdBy:actor,ownerLayer:"loto"};
+  const d=api().loadLoto();d.lotos.push(record);d.events.push({id:uid("event"),type:"LOTO_CREATED",timestamp:createdAt,actor,layer:"loto",recordId:id,lotoNumber:record.lotoNumber,equipmentId:record.equipmentId,payload:{scope:record.scope,status:"draft"}});
+  api().saveLoto(d);close();setTimeout(()=>window.dispatchEvent(new CustomEvent("nexus:loto-guided-points-request",{detail:{lotoId:id,equipmentId:record.equipmentId}})),0);
  });
  window.addEventListener("nexus:loto-start-request",open);window.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("is-open"))close();});
 }
