@@ -74,14 +74,14 @@ function render() {
  dialog.querySelector(".nx-equipment-body").innerHTML=html;
  dialog.querySelector(".nx-equipment-body").scrollTop=top;
 }
-function close() {if(!dialog || !dialog.open)return;dialog.close();selected=null;document.body.classList.remove("nx-equipment-open");if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
+function close() {if(!dialog || !dialog.open)return;if(typeof dialog.close==="function"){try{dialog.close();}catch(e){dialog.removeAttribute("open");}}else dialog.removeAttribute("open");selected=null;document.body.classList.remove("nx-equipment-open");if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
 function open(detail) {
  if(!detail || !detail.equipmentId)return;
  const api=window.NEXUSOneLineLayers;
  const c=detail.context||(api&&typeof api.context==="function"&&api.context())||{projectId:new URLSearchParams(location.search).get("project")||"sample-project",buildingId:new URLSearchParams(location.search).get("building")||"A",diagramId:new URLSearchParams(location.search).get("diagram")||"overall"};
  if(!c)return;
  selected={...detail,context:c};
- if(!dialog.open){previousFocus=document.activeElement;dialog.showModal();document.body.classList.add("nx-equipment-open");}
+ if(!dialog.open){previousFocus=document.activeElement;try{dialog.showModal();}catch(error){dialog.setAttribute("open","");console.error("[NEXUS] Native modal unavailable; using visible dialog fallback",error);}document.body.classList.add("nx-equipment-open");}
  render();dialog.querySelector("[data-equipment-close]").focus();
 }
 function install() {
