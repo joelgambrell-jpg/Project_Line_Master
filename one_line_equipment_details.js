@@ -74,14 +74,14 @@ function render() {
  dialog.querySelector(".nx-equipment-body").innerHTML=html;
  dialog.querySelector(".nx-equipment-body").scrollTop=top;
 }
-function close() {if(!dialog || !dialog.open)return;dialog.close();selected=null;document.body.classList.remove("nx-equipment-open");if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
+function close() {if(!dialog || !dialog.open)return;if(typeof dialog.close==="function"){try{dialog.close();}catch(e){dialog.removeAttribute("open");}}else dialog.removeAttribute("open");selected=null;document.body.classList.remove("nx-equipment-open");if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
 function open(detail) {
  if(!detail || !detail.equipmentId)return;
  const api=window.NEXUSOneLineLayers;
  const c=detail.context||(api&&typeof api.context==="function"&&api.context())||{projectId:new URLSearchParams(location.search).get("project")||"sample-project",buildingId:new URLSearchParams(location.search).get("building")||"A",diagramId:new URLSearchParams(location.search).get("diagram")||"overall"};
  if(!c)return;
  selected={...detail,context:c};
- if(!dialog.open){previousFocus=document.activeElement;dialog.showModal();document.body.classList.add("nx-equipment-open");}
+ if(!dialog.open){previousFocus=document.activeElement;try{dialog.showModal();}catch(error){dialog.setAttribute("open","");console.error("[NEXUS] Native modal unavailable; using visible dialog fallback",error);}document.body.classList.add("nx-equipment-open");}
  render();dialog.querySelector("[data-equipment-close]").focus();
 }
 function install() {
@@ -101,6 +101,23 @@ function install() {
  });
  dialog.addEventListener("cancel",e=>{e.preventDefault();close();});
  dialog.addEventListener("click",e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});
+ // Capture equipment pointer gestures independently of SVG click synthesis.
+ // Redraws during pointerup can destroy the original click target.
+ let press=null;
+ document.addEventListener("pointerdown",e=>{
+  const node=e.target.closest&&e.target.closest(".nexus-one-line .node");
+  if(!node || e.button!==0 || e.target.closest(".nx-loto-svg-lock,.nx-loto-issue-marker"))return;
+  const id=node.querySelector(".id");
+  press=id?{id:String(id.textContent||"").trim(),x:e.clientX,y:e.clientY,pointerId:e.pointerId}:null;
+ },true);
+ document.addEventListener("pointerup",e=>{
+  const p=press;press=null;
+  if(!p||p.pointerId!==e.pointerId||Math.hypot(e.clientX-p.x,e.clientY-p.y)>8)return;
+  if(window.NEXUS_LOTO_POINT_SELECTION_ACTIVE||e.target.closest&&e.target.closest(".nx-loto-svg-lock,.nx-loto-issue-marker"))return;
+  const context=window.NEXUSOneLineLayers&&window.NEXUSOneLineLayers.context();
+  try{open({equipmentId:p.id,context});}catch(error){console.error("[NEXUS] Equipment inspector failed",error);}
+ },true);
+ document.addEventListener("pointercancel",()=>{press=null;},true);
  window.addEventListener("nexus:equipment-selected",e=>open(e.detail));
  window.addEventListener("nexus:open-equipment",e=>open(e.detail));
  ["storage","nexus:loto-change","nexus-one-line-energized-change"].forEach(type=>window.addEventListener(type,render));
