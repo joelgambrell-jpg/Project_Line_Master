@@ -118,6 +118,14 @@ function install() {
   try{open({equipmentId:p.id,context});}catch(error){console.error("[NEXUS] Equipment inspector failed",error);}
  },true);
  document.addEventListener("pointercancel",()=>{press=null;},true);
+ // Equipment details must win over the legacy side panel on a normal tap.
+ document.addEventListener("click",e=>{
+  const node=e.target.closest&&e.target.closest(".nexus-one-line .node");
+  if(!node || e.target.closest(".nx-loto-svg-lock,.nx-loto-issue-marker") || window.NEXUS_LOTO_POINT_SELECTION_ACTIVE)return;
+  const id=String(node.querySelector(".id")?.textContent||"").trim();
+  if(!id)return;
+  try{open({equipmentId:id});}catch(error){console.error("[NEXUS] Equipment pop-out click failed",error);}
+ },true);
  window.addEventListener("nexus:equipment-selected",e=>open(e.detail));
  window.addEventListener("nexus:open-equipment",e=>open(e.detail));
  ["storage","nexus:loto-change","nexus-one-line-energized-change"].forEach(type=>window.addEventListener(type,render));
